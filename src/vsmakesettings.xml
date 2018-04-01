@@ -1,0 +1,270 @@
+<main>
+
+  <topsiment name="tb_AllExamples"/>
+  <topsynthent name="VhdlExamplesTop"/>
+  <searchpath library="work" path="../Doc/..."/>
+  <searchpath library="work" path="../Software/..."/>
+
+  <package path="../package"/>
+  <option name="VhdlVersion=2008"/>
+  <compileroption name="-suppress 8780,2063,143,2071"/>
+
+  <searchpath library="work" component="nicores_CommonCores" path="/CommonFiles/..."/>
+
+  <!-- Suppressing vhook warns in all nicores -->
+  <nocheck expr="{nicores/CoreComponents3/.*}"/>
+
+
+
+  <help>
+
+    <!--
+
+    COMPILEROPTION
+       This section allows you to provide options for vcom. The defaults supplied here
+       suppress certain messages from vcom that are often not useful. Multiple options
+       can use separate <compileroption> tags.
+
+       -nowarn 5
+       Suppress warnings about multiple drivers on unresolved signals
+
+       -O0
+       Remove all vcom optimizations (use this to test workarounds for modelsim crashes)
+
+       -novopt
+       Do not run vopt before compiling (use this to test workarounds for modelsim crashes)
+
+       -suppress 8780,2063,143,2071
+       8780: This is always suppressed by default in an .mpf
+       2063: Complete design-unit 'tb_MyTop' is inside synthesis_off/translate_off pragma
+       143: ** Note: (vcom-143) Recognized 1 FSM in architecture body "HsSimpleRwReg(rtl)".
+       2071: ** Note: (vcom-2071) PkgX.vhd(108) : enabling code coverage.
+
+       Examples:
+         <compileroption name="-nowarn 5 -suppress 8780,2063,143,2071"/>
+         <compileroption name="-check_synthesis"/>
+
+    SEARCHPATH
+       The <searchpath> tag provides information for VSMake to use to collect files for compilation.
+       All relative paths use the location of the .vset as the anchor.
+       Note that dependencies from the package file can be referenced here as well. Reference the
+       component name here along with a relative path to define the search area, e.g.
+       <path library="work" component="nicores_CommonCores" val="/CommonFiles/..."/>
+       It is important to note that VSMake will not recursively search dependencies, so if a component
+       referenced here has its own dependency, that other dependency must also be listed in the local
+       package file and referenced here.
+       Examples:
+         <searchpath library="work" path="../../CommonFiles/..."/>
+         <searchpath library="work" component="nicores_CommonCores" path="/CommonFiles/..."/>
+         <searchpath library="work" path="Perforce://ASIC/Projects/Ironclad/trunk/1.0/..."/>
+
+       Note that although you can specify Perforce paths, VSMake does not automatically sync those paths.
+       It is recommended that you use dependencies from your package file when specifying paths from
+       Perforce so that you can use the Build Services toolchain to sync all dependencies to their head
+       revisions.
+
+    LIBRARY
+       The <library> and <vendorlibrary> tags can be used together to incorporate, and even compile,
+       non-work libraries. Vendor libraries are specified like this:
+
+         <vendorlibrary name="xilinx|altera" language="vhdl|verilog|all" family="virtex7|stratix4|???|all" global="true|false"/>
+
+       The only required attribute is 'name'. Defaults are language="all", family="all", global="false". You can thus specify
+       the compilation of the full xilinx set of libraries into your local project with this simple line:
+
+             <vendorlibrary name="xilinx"/>
+
+       Add global="true" if you want it to be compiled into a location that can be referenced by other projects.
+
+         <vendorlibrary name="xilinx" global="true"/>
+
+       This location must be specified by the VLIBS environment variable. The recommended value for VLIBS is p:/vlibs
+
+           The components in the vendor libraries are referenced using a <searchpath> tag, like this:
+
+         <searchpath library="unisim" path="%XILINX_VIVADO%/data/vhdl/src/unisims/unisim_VCOMP.vhd"/>
+
+       The files found using a non-work <searchpath> tag are not compiled. They are used by VSMake to
+       understand what entities may be vhooked into your design. In the above example, unisim_VCOMP.vhd
+       contains component declarations for all Xilinx primitives. When you 'use' the package in your
+       VHDL file, you can then instantiate any xilinx component (like BUFG) using vhook, with no
+       need to create a VScan model.
+
+       Note that the above example provides a path to the package based on an environment variable
+           which is set by hwSetup. This ensures that the components match the version of the tool that
+           will be used for synthesis.
+
+       VSMake also supports compiling local libraries for you. A library must be its own project (i.e. have its
+       own package file and exist with its own dev/trunk/export hierarchy). Refer to the library with
+       a <library> tag.
+
+       You will need to list the component in your package file as a dependency, and then refer to it
+       using <library> and <searchpath> tags, like this:
+
+           <library component="componentName"/>
+
+       If the component has multiple library targets, you can provide the name attribute to specify
+       which library, e.g:
+           <library name="DustMiteNtSimulationLib" component="DustMiteNtTestbench"/>
+
+       Below are examples to use for DustMiteNT and STC3 simulation libraries.
+
+       DustMiteNT client interface and simulation library
+       - - - - - - - - - - - - - - - - - - - - - - - - - -
+           To use the DustMiteNT in your HDL project, add the following lines to your package file
+           (note that there may be a later version than what's shown here):
+
+           dependency DustMiteNtTestbench
+           {
+              perforcePath = //ASIC/nicores/SimulationModels3/DustMiteNtTestbench/export/1.0/1.0.0a3;
+           }
+
+           In vsmakesettings.xml add the following line:
+
+           <library component="DustMiteNtTestbench"/>
+
+           Then, run vsmake with the 'CompileLibraries=ni' argument.
+
+           This will compile the DustMiteNtSimulationLib for your project. You may also want to add
+           the MiteInterface cores to your package, but these will be compiled into your work library
+           like the other nicores.
+
+       STC3 client interface and simulation library
+       - - - - - - - - - - - - - - - - - - - - - - - - - -
+           To use the STC3 in your HDL project, add the following lines to your package file
+           (note that there may be a later version than what's shown here):
+
+           dependency Stc3Testbench
+           {
+              perforcePath = //ASIC/nicores/SimulationModels3/Stc3Testbench/export/1.0/1.0.0a0;
+           }
+           dependency nicores_stc3client
+           {
+              perforcePath = //ASIC/nicores/CoreComponents3/Stc3Client/export/1.5/1.5.0a1;
+           }
+
+           In the .vset, add the following lines:
+
+           <library component="Stc3Testbench"/>
+           <searchpath library="work" component="nicores_stc3client" path="/main/Source/..."/>
+
+           You may also want to integrate files from ReferenceComponents to your project:
+           //ASIC/nicores/ReferenceComponents/Stc3Client/export/1.1/1.1.0a0/
+           The above path has several folders and files, including one for the StcEndpointInterface.
+
+           Finally, run vsmake with the 'CompileLibraries=ni' argument.
+           This will compile the Stc3SimulatioLib for your project
+
+    REMOVALEXPR
+       The expressions listed here will cause any file that matches them to be removed from the list of files
+       that VSMake processes. Expressions are DOS-style by default. Enclose the expression in curly braces to
+       use regular expression syntax.
+       Examples:
+         <removalexpr expr="some/path/*.v"/>
+         <removalexpr expr="{/nicores/CoreComponents3/CommonCores/.*/Altera/}"/>
+         <removalexpr expr="{/nicores/CoreComponents3/CommonCores/.*/Xilinx/}"/>
+         <removalexpr expr="{/Unused/}"/>
+         <removalexpr expr="{/VoltageRegulator/FaradayAsic/VendorSimulationModels/}"/>
+
+    MAGIC
+       VSMake3 can process different sets of files depending on whether you are running it for simulation (without upf)
+       or synthesis (with upf). These 'magic' expressions determine which files are processed for simulation, which are
+       processed for synthesis, and whether those files are actually compiled by ModelSim or are included in an FPGA
+       synthesis project.
+
+       Here is a description of the various magic expressions:
+
+       <removesynth>  This is a removal expression that only applies for VSMake with upf. In that case, the file will
+                      be removed from processing entirely (i.e. will not be available for vhook). The file will still
+                      be processed when VSMake is run without upf. You would use this when there is another file with
+                      the same entity that is only to be used for simulation (i.e. 'removesim').
+
+       <removesim>    This is a removal expression that only applies for VSMake for simulation (without upf). In that
+                      case, the file will removed from processing entirely (i.e. will not be available for vhook). The
+                      file will still be processed when VSMake is run with upf. You would use this when there is
+                      another file with the same entities that is only to be used for synthesis (i.e. 'removesynth').
+                      Note that when you run vsmake with upf, vhook will only be performed on files that are part of
+                      the synthesis hierarchy and are NOT part of the simulation hierarchy (via 'removesim')
+
+       <nosynthesis> This prevents a matching file from being included in a synthesis project file (via upf or synth).
+                     A 'nosynthesis' file is still processed by VSMake, whether running for simulation or synthesis, so
+                     vhook still works.
+
+       <nocompile>   This prevents the a matching file from being compiled by ModelSim. A 'nocompile' file
+                     is still processed by VSMake, whether running for simulation or synthesis, so vhook still works.
+
+       <nocheck>     This tells VSMake not to report lint or dgv messages on any files that match the expression.
+
+       <novhookwrn>  This tells VSMake not to suppress any vhook_wrn (or vhook_wrn) commands it finds in files that
+                     match the expression.
+
+       <nodgv>       This tells VSMake not to report dgv on any files that match the expression
+
+       <allowsynthesis> By default, files in a non-work library are not considered for synthesis when using the upf
+                        command line option. This tells VSMake to allow files matching the expression to be considered
+                        for inclusion in a synthesis project even if the file is not part of the work library.
+
+       <vscanmodels> This is equivalent to applying 'nocompile', 'nosynthesis', and 'nocheck' to a file. The file will
+                     still be used for vhook purposes, but it will not be compiled, synthesized, or checked.
+       <netlistsub> (Xilinx support only for now) This is used to replace a vhdl file matched by 'expr' (termed a
+                    netlist stub) with a specific file (a netlist) in synthesis.
+
+                    The file matched by 'expr' is treated very similarly to a VScan model: it's used for vhook purposes,
+                    but won't be compiled or checked. It's included in the synthesis hierarchy, but gets replaced by the
+                    file pointed to in the required 'netlistfile' attribute before the synthesis hierarchy gets passed
+                    on to the Xilinx project updater.
+
+                    Note that because of the internal vsmake structure, 'netlistsub' won't function correctly on a file
+                    that is also covered by 'vscanmodels', 'removesynth', or 'nosynthesis' tags. You shouldn't apply
+                    (or need ot apply) any of those tags to files covered by 'netlistsub'.
+
+                    Attributes:
+
+            'expr': Expression to identify the netlist stub. The term "netlist stub" comes from the Xilinx terminology
+                    for a file that contains only an entity and port declaration, plus an empty architecture. In Vivado,
+                    such a file can be created directly from a synthesized top-level with the command:
+
+                     "write_vhdl -mode synth_stub -file <filename>"
+
+            'netlistfile': Required relative or absolute path to a netlist (.edif, .edf, .dcp). When vsmake is run with
+                    the 'upf' option, vsmake will replace the file matched by 'expr' with the netlist pointed to by
+                    'netlistfile' before sending the file-list to the Xilinx project updater.
+
+
+       <noxmlparse>  This tells XmlParse to exclude the matching files from contributing register map info.
+                     It is ignored by VSMake. You should not use this option. Instead, use the <xmlparse></xmlparse>
+                     tags to enclose what you want XmlParse to use and VSMake to ignore.
+
+       <nosynthesis expr="{/(Vendor)?SimulationModels/}"/>
+       <nocheck     expr="{/Vendor(SimulationModels|IP)/}"/>
+       <novhookwrn  expr="{/export/}"/>
+       <nodgv       expr="{/Vendor(SimulationModels|IP)/}"/>
+       <noxmlparse  expr="{nicores/CoreComponents3/Stc3Client/.*/Stc3ClientAll.vhd$}"/>
+       <noxmlparse  expr="{nicores/CoreComponents3/Stc3Client/.*/StatusPushing}"/>
+       <noxmlparse  expr="{nicores/CoreComponents3/Stc3Client/.*/IoPort2}"/>
+       <netliststub expr="*/netliststub/PCIeInchWormCompanion.vhd"
+                    netlistfile="../Target/netlist/PCIeInchWormCompanion.dcp"/>
+
+    GLOBALSETTINGS
+
+       VSMake can refer to another .vset (consider it like a base class) for settings that common to multiple
+       VSMake projects. The path specified can be a Perforce path or a relative path. Absolute paths are also
+       supported, but they are not portable between Windows and Linux, so they are discouraged.
+       Example:
+       <globalsettings path="../../CommonFiles/Source/VSMakeSettings.vset"/>
+
+    PKGREVISION
+
+       The tag <pkgrevision name="PkgRevisionBob"/> specifies that you want vsmake to update the package
+       PkgRevisionBob when you run vsmake -k.  You can list as many <pkgrevision> tags as you want. If you
+       don't list any, VSMake will assume <pkgrevision name="PkgRevision"/> by default.
+       <pkgrevision name="PkgRevisionMite"/>
+       <pkgrevision name="PkgRevisionChinch"/>
+  -->
+
+  <!-- Leave this here -->
+  <item key="SettingsFileVersion">3.003</item>
+
+  </help>
+
+</main>
