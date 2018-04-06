@@ -1,0 +1,6 @@
+# Object/intermediate files
+*.o
+*.cf
+
+# Waveform/simulation files
+*.vcd
