@@ -1,7 +1,7 @@
 -- File              : dff.vhd
 -- Author            : John Gentile <johncgentile17@gmail.com>
 -- Date              : 22.04.2018
--- Last Modified Date: 24.04.2018
+-- Last Modified Date: 19.05.2018
 -- Last Modified By  : John Gentile <johncgentile17@gmail.com>
 --! @file
 --! @brief Basic D-type flip-flop
@@ -27,9 +27,9 @@ library IEEE;
 
 entity DFF is
   port (
-    cD      : in  std _logic; --! Data In
-    clk     : in  std _logic; --! Clock In
-    cQ      : out std _logic  --! Data Out
+    cD      : in  std_logic; --! Data In
+    clk     : in  std_logic; --! Clock In
+    cQ      : out std_logic  --! Data Out
   );
 end DFF;
 
@@ -37,6 +37,7 @@ architecture behav of DFF is
 begin
 
   process (clk)
+  begin
     if rising_edge(clk) then
       cQ <= cD;
     end if;

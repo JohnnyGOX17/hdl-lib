@@ -1,7 +1,7 @@
 -- File              : dff_en.vhd
 -- Author            : John Gentile <johncgentile17@gmail.com>
 -- Date              : 21.04.2018
--- Last Modified Date: 24.04.2018
+-- Last Modified Date: 19.05.2018
 -- Last Modified By  : John Gentile <johncgentile17@gmail.com>
 --! @file
 --! @brief D-type flip-flop w/synchronous enable
@@ -38,11 +38,13 @@ architecture behav of DFF is
 begin
 
   process (clk)
+  begin
     if rising_edge(clk) then
       if (cEn = '1') then
         cQ <= cD;
       else
         cQ <='Z';
+      end if;
     end if;
   end process;
 end behav;
