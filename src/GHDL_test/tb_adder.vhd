@@ -1,28 +1,46 @@
+library IEEE;
+  use IEEE.std_logic_1164.all;
+
 --  A testbench has no ports.
 entity tb_adder is
-  end tb_adder;
+end entity tb_adder;
 
 architecture behav of tb_adder is
-  --  Declaration of the component that will be instantiated.
-  component adder
-    port (i0, i1 : in bit; ci : in bit; s : out bit; co : out bit);
-  end component;
 
-  --  Specifies which entity is bound with the component.
-  for adder_0: adder use entity work.adder;
-  signal i0, i1, ci, s, co : bit;
+  component adder is
+    port (
+      i0 : in  std_logic;
+      i1 : in  std_logic;
+      ci : in  std_logic;
+      s  : out std_logic;
+      co : out std_logic
+    );
+  end Component;
+
+  signal i0 : std_logic;
+  signal i1 : std_logic;
+  signal ci : std_logic;
+  signal s  : std_logic;
+  signal co : std_logic;
+
 begin
   --  Component instantiation.
-  adder_0: adder port map (i0 => i0, i1 => i1, ci => ci,
-                           s => s, co => co);
+  U_DUT : adder
+    port map (
+      i0 => i0,
+      i1 => i1,
+      ci => ci,
+      s  => s,
+      co => co
+    );
 
   --  This process does the real job.
   process
     type pattern_type is record
       --  The inputs of the adder.
-      i0, i1, ci : bit;
+      i0, i1, ci : std_logic;
       --  The expected outputs of the adder.
-      s, co : bit;
+      s, co : std_logic;
     end record;
     --  The patterns to apply.
     type pattern_array is array (natural range <>) of pattern_type;
