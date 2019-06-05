@@ -4,7 +4,7 @@ package pkg_c is
   type array_type is array(integer range 0 to 100) of integer;
   type array_p is access array_type;
 
-  function get_p return array_p;
+  impure function get_p return array_p;
     attribute foreign of get_p : function is "VHPIDIRECT get_p";
 
   function ext_add ( num1 : integer; num2 : integer ) return integer;
@@ -20,7 +20,7 @@ end pkg_c;
 package body pkg_c is
 
   -- function body doesn't need anything in it
-  function get_p return array_p is
+  impure function get_p return array_p is
   begin
     assert false report "VHPI" severity failure;
   end function;

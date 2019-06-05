@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 	ghdl_status = ghdl_main(gargc, gargv);
 
 	end_clock = clock() - start_clock;
-	printf("\tSimulation time: %d sec %06d usec\n",
+	printf("\tSimulation time: %ld sec %06ld usec\n",
 			end_clock / CLOCKS_PER_SEC,
 			end_clock % CLOCKS_PER_SEC);
 
