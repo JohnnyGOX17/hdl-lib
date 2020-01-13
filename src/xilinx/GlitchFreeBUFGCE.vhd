@@ -1,27 +1,3 @@
--- File              : GlitchFreeBUFGCE.vhd
--- Author            : John Gentile <johncgentile17@gmail.com>
--- Date              : 21.04.2018
--- Last Modified Date: 24.04.2018
--- Last Modified By  : John Gentile <johncgentile17@gmail.com>
---! @file
---! @brief BUFG with glitch-free clock gating
--------------------------------------------------------------------------------
--- Copyright (c) 2018 John Gentile <johncgentile17@gmail.com>
---
--- This program is free software: you can redistribute it and/or modify
--- it under the terms of the GNU General Public License as published by
--- the Free Software Foundation, either version 3 of the License, or
--- (at your option) any later version.
---
--- This program is distributed in the hope that it will be useful,
--- but WITHOUT ANY WARRANTY; without even the implied warranty of
--- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--- GNU General Public License for more details.
---
--- You should have received a copy of the GNU General Public License
--- along with this program.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------------------
-
 library IEEE;
   use IEEE.std_logic_1164.all;
 library UNISIM;
@@ -48,16 +24,21 @@ end GlitchFreeBUFGCE;
 architecture RTL of GlitchFreeBUFGCE is
 
   component BUFGCTRL
+    generic (
+      INIT_OUT     : integer := 0;
+      PRESELECT_I0 : boolean := false;
+      PRESELECT_I1 : boolean := false
+    );
     port (
-      CE0     : in  std _logic;
-      CE1     : in  std _logic;
-      IGNORE0 : in  std _logic;
-      IGNORE1 : in  std _logic;
-      I0      : in  std _logic;
-      I1      : in  std _logic;
-      S0      : in  std _logic;
-      S1      : in  std _logic;
-      O       : out std _logic
+      CE0     : in  std_logic;
+      CE1     : in  std_logic;
+      IGNORE0 : in  std_logic;
+      IGNORE1 : in  std_logic;
+      I0      : in  std_logic;
+      I1      : in  std_logic;
+      S0      : in  std_logic;
+      S1      : in  std_logic;
+      O       : out std_logic
     );
   end component;
 
