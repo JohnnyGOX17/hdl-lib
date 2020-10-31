@@ -8,33 +8,42 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
 
-entity complex_multiply is
+entity complex_multiply_mult3 is
   generic (
     G_AWIDTH : natural := 16; -- size of 1st input of multiplier
     G_BWIDTH : natural := 18  -- size of 2nd input of multiplier
   );
   port (
     clk      : in  std_logic;
+    ab_valid : in  std_logic; -- A & B complex input data valid
     ar       : in  std_logic_vector(G_AWIDTH - 1 downto 0); -- 1st input's real part
     ai       : in  std_logic_vector(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
     br       : in  std_logic_vector(G_BWIDTH - 1 downto 0); -- 2nd input's real part
     bi       : in  std_logic_vector(G_BWIDTH - 1 downto 0); -- 2nd input's imaginary part
+    p_valid  : out std_logic; -- Product complex output data valid
     pr       : out std_logic_vector(G_AWIDTH + G_BWIDTH downto 0); -- real part of output
     pi       : out std_logic_vector(G_AWIDTH + G_BWIDTH downto 0)  -- imaginary part of output
   );
-end complex_multiply;
+end complex_multiply_mult3;
 
-architecture rtl of complex_multiply is
+architecture rtl of complex_multiply_mult3 is
 
-  signal ai_d, ai_dd, ai_ddd, ai_dddd             : signed(G_AWIDTH - 1 downto 0);
-  signal ar_d, ar_dd, ar_ddd, ar_dddd             : signed(G_AWIDTH - 1 downto 0);
-  signal bi_d, bi_dd, bi_ddd, br_d, br_dd, br_ddd : signed(G_BWIDTH - 1 downto 0);
-  signal addcommon                                : signed(G_AWIDTH downto 0);
-  signal addr, addi                               : signed(G_BWIDTH downto 0);
-  signal mult0, multr, multi, pr_int, pi_int      : signed(G_AWIDTH + G_BWIDTH downto 0);
-  signal common, commonr1, commonr2               : signed(G_AWIDTH + G_BWIDTH downto 0);
+  signal ai_d, ai_dd, ai_ddd, ai_dddd             : signed(G_AWIDTH - 1 downto 0) := (others => '0');
+  signal ar_d, ar_dd, ar_ddd, ar_dddd             : signed(G_AWIDTH - 1 downto 0) := (others => '0');
+  signal bi_d, bi_dd, bi_ddd, br_d, br_dd, br_ddd : signed(G_BWIDTH - 1 downto 0) := (others => '0');
+  signal addcommon                                : signed(G_AWIDTH downto 0) := (others => '0');
+  signal addr, addi                               : signed(G_BWIDTH downto 0) := (others => '0');
+  signal mult0, multr, multi, pr_int, pi_int      : signed(G_AWIDTH + G_BWIDTH downto 0) := (others => '0');
+  signal common, commonr1, commonr2               : signed(G_AWIDTH + G_BWIDTH downto 0) := (others => '0');
+
+  constant K_PIPE_DELAY : integer := 6; -- # clk cycles of pipeline delay through component
+  signal sig_valid_sr   : std_logic_vector(K_PIPE_DELAY - 1 downto 0) := (others => '0');
 
 begin
+
+  p_valid <= sig_valid_sr(sig_valid_sr'high);
+  pr      <= std_logic_vector(pr_int);
+  pi      <= std_logic_vector(pi_int);
 
   S_reg_products: process(clk)
   begin
@@ -49,6 +58,9 @@ begin
       bi_d   <= signed(bi);
       bi_dd  <= signed(bi_d);
       bi_ddd <= signed(bi_dd);
+
+      -- shift register to delay data valid to match pipeline delay
+      sig_valid_sr <= sig_valid_sr(K_PIPE_DELAY - 2 downto 0) & ab_valid;
     end if;
   end process;
 
@@ -88,9 +100,6 @@ begin
       pi_int   <= multi + commonr2;
     end if;
   end process;
-
-  pr <= std_logic_vector(pr_int);
-  pi <= std_logic_vector(pi_int);
 
 end architecture rtl;
 
