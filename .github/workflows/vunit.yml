@@ -1,3 +1,5 @@
+# Runs top-level VUnit run.py for GitHub actions
+# Docs: https://vunit.github.io/ci/script.html
 name: VUnit Tests
 
 on:
