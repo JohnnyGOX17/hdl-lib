@@ -12,14 +12,14 @@ entity pwm is
     G_FREQ_DIV   : integer := 16   -- divides input clk period to create slower PWM output (power of 2)
   );
   port (
-    clk        : in  std_logic;
-    reset      : in  std_logic; -- sync reset
+    clk          : in  std_logic;
+    reset        : in  std_logic; -- sync reset
     -- # of output clock cycles (clk/G_FREQ_DIV) for PWM period
-    pwm_period : in  std_logic_vector(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0);
+    pwm_period   : in  std_logic_vector(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0);
     -- # of output clock cycles the PWM output signal is high in the PWM period
-    pwm_on     : in  std_logic_vector(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0);
-    pwm_load   : in  std_logic; -- captures pwm_period & pwm_on when high
-    pwm_out    : out std_logic
+    pwm_on       : in  std_logic_vector(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0);
+    pwm_load     : in  std_logic; -- captures pwm_period & pwm_on when high
+    pwm_out      : out std_logic
   );
 end entity pwm;
 
@@ -130,12 +130,12 @@ begin
       G_FREQ_DIV   => 4
     )
     port map (
-      clk        => clk,
-      reset      => reset,
-      pwm_period => pwm_period,
-      pwm_on     => pwm_on,
-      pwm_load   => pwm_load,
-      pwm_out    => pwm_out
+      clk          => clk,
+      reset        => reset,
+      pwm_period   => pwm_period,
+      pwm_on       => pwm_on,
+      pwm_load     => pwm_load,
+      pwm_out      => pwm_out
     );
 
   clk   <= not clk after 2.5 ns when not sim_end else '0';

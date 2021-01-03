@@ -5,3 +5,9 @@
 ![GitHub](https://img.shields.io/github/license/JohnnyGOX17/hdl-lib)
 
 Library of common and re-use components and HDL code.
+
+## Testing / Verification
+
+### VUnit
+
+Run `python run.py -v`

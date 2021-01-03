@@ -8,7 +8,7 @@ lib = vu.add_library("lib")
 
 # Add all files ending in *.vhd to library "lib"
 #lib.add_source_files("./vhdl/*/*.vhd")
-lib.add_source_files("./vhdl/Memory-FIFO-SRL/sp_ram.vhd")
+lib.add_source_files("./vhdl/memory-FIFO-SRL/RAM-ROM/*.vhd")
 
 # GHDL options
 #vu.set_compile_option("ghdl.flags", ["--std=08", "--enable-openieee"])
