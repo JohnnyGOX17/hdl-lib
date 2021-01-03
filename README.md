@@ -1,2 +1,3 @@
 # HDL Library
-Examples of VHDL code &amp; designs
+
+Library of common and re-use components and HDL code.

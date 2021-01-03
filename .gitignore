@@ -12,3 +12,6 @@ Doc/
 *.jou
 *.log
 *.str
+
+# CI/cocotb/VUnit
+vunit_out/
