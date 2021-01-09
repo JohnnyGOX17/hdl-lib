@@ -14,13 +14,13 @@ entity complex_multiply_mult4 is
   port (
     clk      : in  std_logic;
     ab_valid : in  std_logic; -- A & B complex input data valid
-    ar       : in  std_logic_vector(G_AWIDTH - 1 downto 0); -- 1st input's real part
-    ai       : in  std_logic_vector(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
-    br       : in  std_logic_vector(G_BWIDTH - 1 downto 0); -- 2nd input's real part
-    bi       : in  std_logic_vector(G_BWIDTH - 1 downto 0); -- 2nd input's imaginary part
+    ar       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's real part
+    ai       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
+    br       : in  signed(G_BWIDTH - 1 downto 0); -- 2nd input's real part
+    bi       : in  signed(G_BWIDTH - 1 downto 0); -- 2nd input's imaginary part
     p_valid  : out std_logic; -- Product complex output data valid
-    pr       : out std_logic_vector(G_AWIDTH + G_BWIDTH downto 0); -- real part of output
-    pi       : out std_logic_vector(G_AWIDTH + G_BWIDTH downto 0)  -- imaginary part of output
+    pr       : out signed(G_AWIDTH + G_BWIDTH downto 0); -- real part of output
+    pi       : out signed(G_AWIDTH + G_BWIDTH downto 0)  -- imaginary part of output
   );
 end complex_multiply_mult4;
 
@@ -36,17 +36,17 @@ architecture rtl of complex_multiply_mult4 is
 
 begin
 
-  pr      <= std_logic_vector( addr );
-  pi      <= std_logic_vector( addi );
+  pr      <= addr;
+  pi      <= addi;
   p_valid <= sig_valid_sr(sig_valid_sr'high);
 
   S_reg_inputs: process(clk)
   begin
     if rising_edge(clk) then
-      ar_q <= signed( ar );
-      ai_q <= signed( ai );
-      br_q <= signed( br );
-      bi_q <= signed( bi );
+      ar_q <= ar;
+      ai_q <= ai;
+      br_q <= br;
+      bi_q <= bi;
       -- shift register to delay data valid to match pipeline delay
       sig_valid_sr <= sig_valid_sr(K_PIPE_DELAY - 2 downto 0) & ab_valid;
     end if;

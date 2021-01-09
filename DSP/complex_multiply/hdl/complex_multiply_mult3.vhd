@@ -16,13 +16,13 @@ entity complex_multiply_mult3 is
   port (
     clk      : in  std_logic;
     ab_valid : in  std_logic; -- A & B complex input data valid
-    ar       : in  std_logic_vector(G_AWIDTH - 1 downto 0); -- 1st input's real part
-    ai       : in  std_logic_vector(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
-    br       : in  std_logic_vector(G_BWIDTH - 1 downto 0); -- 2nd input's real part
-    bi       : in  std_logic_vector(G_BWIDTH - 1 downto 0); -- 2nd input's imaginary part
+    ar       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's real part
+    ai       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
+    br       : in  signed(G_BWIDTH - 1 downto 0); -- 2nd input's real part
+    bi       : in  signed(G_BWIDTH - 1 downto 0); -- 2nd input's imaginary part
     p_valid  : out std_logic; -- Product complex output data valid
-    pr       : out std_logic_vector(G_AWIDTH + G_BWIDTH downto 0); -- real part of output
-    pi       : out std_logic_vector(G_AWIDTH + G_BWIDTH downto 0)  -- imaginary part of output
+    pr       : out signed(G_AWIDTH + G_BWIDTH downto 0); -- real part of output
+    pi       : out signed(G_AWIDTH + G_BWIDTH downto 0)  -- imaginary part of output
   );
 end complex_multiply_mult3;
 
@@ -42,22 +42,22 @@ architecture rtl of complex_multiply_mult3 is
 begin
 
   p_valid <= sig_valid_sr(sig_valid_sr'high);
-  pr      <= std_logic_vector(pr_int);
-  pi      <= std_logic_vector(pi_int);
+  pr      <= pr_int;
+  pi      <= pi_int;
 
   S_reg_products: process(clk)
   begin
     if rising_edge(clk) then
-      ar_d   <= signed(ar);
-      ar_dd  <= signed(ar_d);
-      ai_d   <= signed(ai);
-      ai_dd  <= signed(ai_d);
-      br_d   <= signed(br);
-      br_dd  <= signed(br_d);
-      br_ddd <= signed(br_dd);
-      bi_d   <= signed(bi);
-      bi_dd  <= signed(bi_d);
-      bi_ddd <= signed(bi_dd);
+      ar_d   <= ar;
+      ar_dd  <= ar_d;
+      ai_d   <= ai;
+      ai_dd  <= ai_d;
+      br_d   <= br;
+      br_dd  <= br_d;
+      br_ddd <= br_dd;
+      bi_d   <= bi;
+      bi_dd  <= bi_d;
+      bi_ddd <= bi_dd;
 
       -- shift register to delay data valid to match pipeline delay
       sig_valid_sr <= sig_valid_sr(K_PIPE_DELAY - 2 downto 0) & ab_valid;

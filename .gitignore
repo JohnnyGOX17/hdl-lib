@@ -15,3 +15,5 @@ Doc/
 
 # CI/cocotb/VUnit
 vunit_out/
+__pycache__/
+results.xml
