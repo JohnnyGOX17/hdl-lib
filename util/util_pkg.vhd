@@ -8,7 +8,9 @@ library ieee;
 package util_pkg is
 
 -- // Start: Common Types /////////////////////////////////////////////////////
-  type T_slv_2D is array (integer range <>) of std_logic_vector;
+  type T_slv_2D      is array (integer range <>) of std_logic_vector;
+  type T_signed_2D   is array (integer range <>) of signed;
+  type T_unsigned_2D is array (integer range <>) of unsigned;
 -- // End: Common Types ///////////////////////////////////////////////////////
 
 -- // Start: File I/O Utilities ///////////////////////////////////////////////
