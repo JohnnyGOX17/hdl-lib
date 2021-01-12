@@ -8,8 +8,10 @@ library ieee;
 
 entity complex_multiply_mult4 is
   generic (
-    G_AWIDTH : natural := 16; -- size of 1st input of multiplier
-    G_BWIDTH : natural := 18  -- size of 2nd input of multiplier
+    G_AWIDTH : natural := 16;    -- size of 1st input of multiplier
+    G_BWIDTH : natural := 18;    -- size of 2nd input of multiplier
+    G_CONJ_A : boolean := false; -- take complex conjugate of arg A
+    G_CONJ_B : boolean := false  -- take complex conjugate of arg B
   );
   port (
     clk      : in  std_logic;
@@ -44,9 +46,17 @@ begin
   begin
     if rising_edge(clk) then
       ar_q <= ar;
-      ai_q <= ai;
+      if G_CONJ_A then
+        ai_q <= -ai;
+      else
+        ai_q <= ai;
+      end if;
       br_q <= br;
-      bi_q <= bi;
+      if G_CONJ_B then
+        bi_q <= -bi;
+      else
+        bi_q <= bi;
+      end if;
       -- shift register to delay data valid to match pipeline delay
       sig_valid_sr <= sig_valid_sr(K_PIPE_DELAY - 2 downto 0) & ab_valid;
     end if;

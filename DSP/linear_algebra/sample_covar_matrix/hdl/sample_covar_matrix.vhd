@@ -28,12 +28,14 @@ architecture rtl of sample_covar_matrix is
 
 begin
 
-  -- create triangular fused complext multiply of input and its complex transpose
-  UG_gen_rows: for i in 0 to N - 1 generate
+  -- create triangular, fused, complex multiply of input and its complex transpose
+  UG_gen_rows: for i in 0 to G_N - 1 generate
     UG_gen_columns: for j in 0 to i generate
     end generate UG_gen_columns;
   end generate UG_gen_rows;
 
+  -- #TODO: create artihmetic dir, add complex MAC component
+  -- #TODO: create generic to cmult below to take conj() of `b` arg
   U_cmplx_mult: entity work.complex_multiply_mult4
     generic map (
       G_AWIDTH => G_DATA_WIDTH, -- size of 1st input of multiplier

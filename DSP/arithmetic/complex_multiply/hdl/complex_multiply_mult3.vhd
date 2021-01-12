@@ -10,8 +10,10 @@ library ieee;
 
 entity complex_multiply_mult3 is
   generic (
-    G_AWIDTH : natural := 16; -- size of 1st input of multiplier
-    G_BWIDTH : natural := 18  -- size of 2nd input of multiplier
+    G_AWIDTH : natural := 16;    -- size of 1st input of multiplier
+    G_BWIDTH : natural := 18;    -- size of 2nd input of multiplier
+    G_CONJ_A : boolean := false; -- take complex conjugate of arg A
+    G_CONJ_B : boolean := false  -- take complex conjugate of arg B
   );
   port (
     clk      : in  std_logic;
@@ -50,12 +52,20 @@ begin
     if rising_edge(clk) then
       ar_d   <= ar;
       ar_dd  <= ar_d;
-      ai_d   <= ai;
+      if G_CONJ_A then
+        ai_d   <= -ai;
+      else
+        ai_d   <= ai;
+      end if;
       ai_dd  <= ai_d;
       br_d   <= br;
       br_dd  <= br_d;
       br_ddd <= br_dd;
-      bi_d   <= bi;
+      if G_CONJ_B then
+        bi_d   <= -bi;
+      else
+        bi_d   <= bi;
+      end if;
       bi_dd  <= bi_d;
       bi_ddd <= bi_dd;
 
