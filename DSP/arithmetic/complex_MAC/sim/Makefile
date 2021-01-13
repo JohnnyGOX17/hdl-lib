@@ -6,27 +6,37 @@ SIM ?= ghdl
 PWD=$(shell pwd)
 
 # Name of Python cocotb testbench file
-MODULE   := cocotb_tb_complex_multiply
+MODULE   := cocotb_tb_complex_MAC
 # Name of toplevel target module in HDL file
-TOPLEVEL := complex_multiply_mult4
+TOPLEVEL := complex_mac
 
 # DUT generics/parameters (exported for test)
-AWIDTH ?= 16
-BWIDTH ?= 16
+AWIDTH   ?= 8
+BWIDTH   ?= 8
+MACWIDTH ?= 32
 export AWIDTH
 export BWIDTH
+export MACWIDTH
 
 # Set different parameters based on target language & simulator
 ifeq ($(TOPLEVEL_LANG),vhdl)
-	VHDL_SOURCES = $(PWD)/../hdl/complex_multiply_mult4.vhd
+	VHDL_SOURCES = $(PWD)/../../complex_multiply/hdl/complex_multiply_mult4.vhd $(PWD)/../../complex_multiply/hdl/complex_multiply_mult3.vhd $(PWD)/../hdl/complex_mac.vhd
 
 	# Set VHDL DUT Generic's
 	# ghdl, questa, and aldec all use SIM_ARGS with '-g' for setting generics
 	ifneq ($(filter $(SIM),ghdl questa modelsim riviera activehdl),)
-		SIM_ARGS += -gG_AWIDTH=$(AWIDTH) -gG_BWIDTH=$(BWIDTH)
+		SIM_ARGS += -gG_AWIDTH=$(AWIDTH) -gG_BWIDTH=$(BWIDTH) -gG_MAC_WIDTH=$(MACWIDTH)
 	else ifneq ($(filter $(SIM),ius xcelium),)
-		SIM_ARGS += -generic "$(TOPLEVEL):G_AWIDTH=>$(AWIDTH)" -generic "$(TOPLEVEL):G_BWIDTH=>$(BWIDTH)"
-  endif
+		SIM_ARGS += -generic "$(TOPLEVEL):G_AWIDTH=>$(AWIDTH)" -generic "$(TOPLEVEL):G_BWIDTH=>$(BWIDTH)" -generic "$(TOPLEVEL):G_MAC_WIDTH=>$(MACWIDTH)"
+	endif
+
+	ifeq ($(SIM),ghdl)
+		EXTRA_ARGS += --std=08
+		SIM_ARGS += --wave=wave.ghw
+	else ifneq ($(filter $(SIM),questa modelsim riviera activehdl),)
+		COMPILE_ARGS += -2008
+	endif
+
 #else ifeq($(TOPLEVEL_LANG),verilog)
 	# Set verilog specific params, like: https://github.com/cocotb/cocotb/blob/master/examples/matrix_multiplier/tests/Makefile
 else

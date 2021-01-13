@@ -1,5 +1,4 @@
 # Simulation tesbench using Cocotb
-
 import os
 import random
 import cocotb
@@ -18,11 +17,22 @@ B_MAX  =  (2**(BWIDTH-1) - 1)
 
 
 @cocotb.test()
-async def test_complex_multiply(dut):
-    """ Validate complex multiply math"""
+async def test_complex_MAC(dut):
+    """ Validate complex MAC math"""
 
     clk = Clock(dut.clk, 10, units="ns") # create 10ns period clock on input port `clk`
     cocotb.fork(clk.start()) # start clk
+
+    # Initialize inputs & variables
+    dut.clr      <= 0
+    dut.ab_valid <= 0
+    test_acc = complex( 0, 0 )
+
+    # Assert clear, then deassert (synchronously)
+    await RisingEdge(dut.clk) # synchronous with input clk
+    dut.clr <= 1
+    await RisingEdge(dut.clk) # synchronous with input clk
+    dut.clr <= 0
 
     dut._log.info("DUT generics: AWIDTH={} | BWIDTH={}".format(AWIDTH, BWIDTH))
     await RisingEdge(dut.clk) # synchronous with input clk
@@ -36,7 +46,8 @@ async def test_complex_multiply(dut):
         b_imag = random.randint(B_MIN, B_MAX)
         b_val  = complex( b_real, b_imag )
         dut._log.info("Inputs: A = {}, B = {}".format(a_val, b_val))
-        expected_out  = a_val * b_val
+        expected_out  = (a_val * b_val) + test_acc
+        test_acc      = expected_out
         expected_real = expected_out.real
         expected_imag = expected_out.imag
         dut._log.info("Expected Output: {}".format(expected_out))
@@ -54,14 +65,14 @@ async def test_complex_multiply(dut):
         # wait for output data valid and compare to model
         while True:
             await RisingEdge(dut.clk) # synchronous with input clk
-            if dut.p_valid == 1:
+            if dut.mac_valid == 1:
                 break
         # NOTE: *.value.integer is interpreted as an unsigned integer
-        p_real = dut.pr.value.signed_integer
-        p_imag = dut.pi.value.signed_integer
-        dut._log.info("DUT Output: {}".format(complex(p_real, p_imag)))
-        assert p_real == expected_real, "Randomized test failed! DUT real output {} doesn't match expected {}".format(p_real, expected_real)
-        assert p_imag == expected_imag, "Randomized test failed! DUT imag output {} doesn't match expected {}".format(p_imag, expected_imag)
+        mac_real = dut.mac_r.value.signed_integer
+        mac_imag = dut.mac_i.value.signed_integer
+        dut._log.info("DUT Output: {}".format(complex(mac_real, mac_imag)))
+        assert mac_real == expected_real, "Randomized test failed! DUT real output {} doesn't match expected {}".format(mac_real, expected_real)
+        assert mac_imag == expected_imag, "Randomized test failed! DUT imag output {} doesn't match expected {}".format(mac_imag, expected_imag)
 
     await Timer(1, units='ns') # example of waiting 1ns
     dut._log.info("Test complete!")

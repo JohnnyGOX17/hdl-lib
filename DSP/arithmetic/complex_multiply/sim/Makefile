@@ -26,7 +26,15 @@ ifeq ($(TOPLEVEL_LANG),vhdl)
 		SIM_ARGS += -gG_AWIDTH=$(AWIDTH) -gG_BWIDTH=$(BWIDTH)
 	else ifneq ($(filter $(SIM),ius xcelium),)
 		SIM_ARGS += -generic "$(TOPLEVEL):G_AWIDTH=>$(AWIDTH)" -generic "$(TOPLEVEL):G_BWIDTH=>$(BWIDTH)"
-  endif
+	endif
+
+	ifeq ($(SIM),ghdl)
+		EXTRA_ARGS += --std=08
+		SIM_ARGS += --wave=wave.ghw
+	else ifneq ($(filter $(SIM),questa modelsim riviera activehdl),)
+		COMPILE_ARGS += -2008
+	endif
+
 #else ifeq($(TOPLEVEL_LANG),verilog)
 	# Set verilog specific params, like: https://github.com/cocotb/cocotb/blob/master/examples/matrix_multiplier/tests/Makefile
 else
