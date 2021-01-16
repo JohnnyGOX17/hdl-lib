@@ -35,7 +35,9 @@ for i in range(0, N):         # rows
             if i != j:
                 ct[j,i] = np.conjugate( ct[i,j] )
 
-# when M = pow2, can use simple lsh bitwise op (FXP) for divide-by-M
+# when M = pow2, can use simple lsh bitwise op (FXP) for divide-by-M, and
+# use seperate wrapper component to do /div & give option to either stream/double-buffer
+# output covar matrix, or just output 3D signed array directly for use somewhere else
 ct = ct/M
 print("Dataflow model output:")
 print(ct)
