@@ -8,39 +8,36 @@ Library of common and re-use components and HDL code.
 
 ## Catalog of Components
 
+```
 ├── DSP
 │   ├── arithmetic
 │   │   ├── adder_tree
 │   │   ├── complex_MAC
 │   │   └── complex_multiply
-│   │       ├── hdl
-│   │       │   ├── complex_multiply_mult3.vhd
-│   │       │   └── complex_multiply_mult4.vhd
 │   ├── CORDIC
 │   ├── filters
 │   │   └── FIR
-│   │       └── systolic_FIR.vhd
+│   │       └── systolic_FIR
 │   └── linear_algebra
 │       ├── dot_product
 │       └── sample_covar_matrix
 ├── IO_interfaces
-│   ├── bidir_iobuf.vhd
+│   ├── bidir_iobuf
 │   ├── PWM
-│   └── seven_seg_disp.vhd
+│   └── seven_seg_disp
 ├── memory-FIFO-SRL
 │   ├── RAM-ROM
-│   │   └── sp_ram.vhd
+│   │   └── sp_ram
 │   └── shift_reg
-│       ├── Makefile
-│       ├── static_shift_reg_bit.vhd
-│       └── static_shift_reg_vec.vhd
+│       ├── static_shift_reg_bit
+│       └── static_shift_reg_vec
 ├── util
-│   └── util_pkg.vhd
+│   └── util_pkg
 └── vendor
     ├── GHDL_test
     └── Xilinx
-        └── GlitchFreeBUFGCE.vhd
-
+        └── GlitchFreeBUFGCE
+```
 
 ## Testing / Verification
 
