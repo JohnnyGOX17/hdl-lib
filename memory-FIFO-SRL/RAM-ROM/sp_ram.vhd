@@ -75,6 +75,8 @@ library ieee;
   use ieee.math_real.all;
   use ieee.numeric_std.all;
   use std.textio.all;
+library work;
+  use work.util_pkg.all;
 library vunit_lib;
 context vunit_lib.vunit_context;
 
