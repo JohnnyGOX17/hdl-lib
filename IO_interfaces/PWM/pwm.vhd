@@ -3,8 +3,9 @@
 --
 library ieee;
   use ieee.std_logic_1164.all;
-  use ieee.math_real.all;
   use ieee.numeric_std.all;
+library work;
+  use work.util_pkg.all;
 
 entity pwm is
   generic (
@@ -15,9 +16,9 @@ entity pwm is
     clk          : in  std_logic;
     reset        : in  std_logic; -- sync reset
     -- # of output clock cycles (clk/G_FREQ_DIV) for PWM period
-    pwm_period   : in  std_logic_vector(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0);
+    pwm_period   : in  std_logic_vector(F_clog2(G_MAX_PERIOD) - 1 downto 0);
     -- # of output clock cycles the PWM output signal is high in the PWM period
-    pwm_on       : in  std_logic_vector(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0);
+    pwm_on       : in  std_logic_vector(F_clog2(G_MAX_PERIOD) - 1 downto 0);
     pwm_load     : in  std_logic; -- captures pwm_period & pwm_on when high
     pwm_out      : out std_logic
   );
@@ -28,11 +29,11 @@ architecture rtl of pwm is
   type T_pwm_state is (S_PWM_ON, S_PWM_OFF);
   signal sig_pwm_state    : T_pwm_state := S_PWM_ON;
 
-  signal sig_pwm_period   : unsigned(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0) := (others => '0');
-  signal sig_pwm_on       : unsigned(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0) := (others => '0');
-  signal sig_pwm_cntr     : unsigned(integer(ceil(log2(real(G_MAX_PERIOD))))-1 downto 0) := (others => '0');
+  signal sig_pwm_period   : unsigned(F_clog2(G_MAX_PERIOD)-1 downto 0) := (others => '0');
+  signal sig_pwm_on       : unsigned(F_clog2(G_MAX_PERIOD)-1 downto 0) := (others => '0');
+  signal sig_pwm_cntr     : unsigned(F_clog2(G_MAX_PERIOD)-1 downto 0) := (others => '0');
 
-  signal sig_div_clk_cntr : unsigned(integer(ceil(log2(real(G_FREQ_DIV))))-1 downto 0)   := (others => '0');
+  signal sig_div_clk_cntr : unsigned(F_clog2(G_FREQ_DIV)-1 downto 0)   := (others => '0');
   signal sig_div_clk      : std_logic;
 
 begin

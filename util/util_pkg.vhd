@@ -8,20 +8,20 @@ library ieee;
 package util_pkg is
 
 -- // Start: Common Types /////////////////////////////////////////////////////
+  -- VHDL-2008 unbounded array definitions
   type T_slv_2D      is array (integer range <>) of std_logic_vector;
   type T_signed_2D   is array (integer range <>) of signed;
   type T_unsigned_2D is array (integer range <>) of unsigned;
-
   type T_slv_3D      is array (integer range <>) of T_slv_2D;
   type T_signed_3D   is array (integer range <>) of T_signed_2D;
   type T_unsigned_3D is array (integer range <>) of T_unsigned_2D;
 -- // End: Common Types ///////////////////////////////////////////////////////
 
 -- // Start: File I/O Utilities ///////////////////////////////////////////////
-  --
-  function F_read_file_slv_2D( file_path  : string;
-                               slv_length : integer;
-                               dim_length : integer ) return T_slv_2D;
+  -- #TODO
+  --function F_read_file_slv_2D( file_path  : string;
+  --                             slv_length : integer;
+  --                             dim_length : integer ) return T_slv_2D;
 -- // End: File I/O Utilities /////////////////////////////////////////////////
 
 -- // Start: String Utilities /////////////////////////////////////////////////
@@ -34,6 +34,11 @@ package util_pkg is
                              B : integer ) return integer;
   function F_return_larger( A : integer;
                             B : integer ) return integer;
+
+  function   F_clog2( x : real )    return integer;
+  function   F_clog2( x : natural ) return integer;
+  function F_is_even( x : integer ) return boolean;
+  function  F_is_odd( x : integer ) return boolean;
 -- // End: Number Utilities ///////////////////////////////////////////////////
 
 end util_pkg;
@@ -41,25 +46,26 @@ end util_pkg;
 package body util_pkg is
 
 -- // Start: File I/O Utilities ///////////////////////////////////////////////
-  function F_read_file_slv_2D( file_path  : string;
-                               slv_length : integer;
-                               dim_length : integer ) return T_slv_2D is
-    file     fd       : text;
-    variable V_line   : line;
-    variable V_bitvec : bit_vector(slv_length - 1 downto 0);
-    variable V_return : T_slv_2D(dim_length - 1 downto 0)(slv_length -1 downto 0)
-                        := (others => (others => '0'));
-  begin
-    if FilePath /= "" then
-      file_open( fd, file_path, read_mode );
-      for i in 0 to dim_length - 1 loop
-        readline( fd, V_line );
-        read( V_line, V_bitvec );
-        V_return(i) := to_stdlogicvector( V_bitvec );
-      end loop;
-    end if;
-    return V_return;
-  end F_read_file_slv_2D;
+  -- #TODO
+  --function F_read_file_slv_2D( file_path  : string;
+  --                             slv_length : integer;
+  --                             dim_length : integer ) return T_slv_2D is
+  --  file     fd       : text;
+  --  variable V_line   : line;
+  --  variable V_bitvec : bit_vector(slv_length - 1 downto 0);
+  --  variable V_return : T_slv_2D(dim_length - 1 downto 0)(slv_length -1 downto 0)
+  --                      := (others => (others => '0'));
+  --begin
+  --  if FilePath /= "" then
+  --    file_open( fd, file_path, read_mode );
+  --    for i in 0 to dim_length - 1 loop
+  --      readline( fd, V_line );
+  --      read( V_line, V_bitvec );
+  --      V_return(i) := to_stdlogicvector( V_bitvec );
+  --    end loop;
+  --  end if;
+  --  return V_return;
+  --end F_read_file_slv_2D;
 -- // End: File I/O Utilities /////////////////////////////////////////////////
 
 -- // Start: String Utilities /////////////////////////////////////////////////
@@ -94,6 +100,26 @@ package body util_pkg is
       return B;
     end if;
   end F_return_larger;
+
+  function F_clog2( x : real ) return integer is
+  begin
+    return integer(ceil(log2(x)));
+  end F_clog2;
+
+  function F_clog2( x : natural ) return integer is
+  begin
+    return F_clog2(real(x));
+  end F_clog2;
+
+  function F_is_even( x : integer ) return boolean is
+  begin
+    return (x mod 2) = 0;
+  end F_is_even;
+
+  function F_is_odd( x : integer ) return boolean is
+  begin
+    return (x mod 2) = 1;
+  end F_is_odd;
 -- // End: Number Utilities ///////////////////////////////////////////////////
 
 end util_pkg;

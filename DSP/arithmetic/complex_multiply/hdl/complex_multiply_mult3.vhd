@@ -17,6 +17,7 @@ entity complex_multiply_mult3 is
   );
   port (
     clk      : in  std_logic;
+    reset    : in  std_logic := '0'; -- (optional) sync reset for *valid's
     ab_valid : in  std_logic; -- A & B complex input data valid
     ar       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's real part
     ai       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
@@ -70,7 +71,11 @@ begin
       bi_ddd <= bi_dd;
 
       -- shift register to delay data valid to match pipeline delay
-      sig_valid_sr <= sig_valid_sr(K_PIPE_DELAY - 2 downto 0) & ab_valid;
+      if reset = '1' then
+        sig_valid_sr <= (others => '0');
+      else
+        sig_valid_sr <= sig_valid_sr(K_PIPE_DELAY - 2 downto 0) & ab_valid;
+      end if;
     end if;
   end process;
 

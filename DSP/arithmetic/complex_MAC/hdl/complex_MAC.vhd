@@ -18,7 +18,7 @@ entity complex_mac is
   );
   port (
     clk         : in  std_logic;
-    clr         : in  std_logic; -- Zeros accumulator register (active-high)
+    reset       : in  std_logic; -- sync reset for *valid's & accumulator register
     ab_valid    : in  std_logic; -- A & B input data valid
     ar          : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's real part
     ai          : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
@@ -41,6 +41,7 @@ architecture rtl of complex_mac is
     );
     port (
       clk      : in  std_logic;
+      reset    : in  std_logic := '0'; -- (optional) sync reset for *valid's
       ab_valid : in  std_logic; -- A & B complex input data valid
       ar       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's real part
       ai       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
@@ -61,6 +62,7 @@ architecture rtl of complex_mac is
     );
     port (
       clk      : in  std_logic;
+      reset    : in  std_logic := '0'; -- (optional) sync reset for *valid's
       ab_valid : in  std_logic; -- A & B complex input data valid
       ar       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's real part
       ai       : in  signed(G_AWIDTH - 1 downto 0); -- 1st input's imaginary part
@@ -95,6 +97,7 @@ begin
       )
       port map (
         clk      => clk,
+        reset    => reset,
         ab_valid => ab_valid,
         ar       => ar,
         ai       => ai,
@@ -116,6 +119,7 @@ begin
       )
       port map (
         clk      => clk,
+        reset    => reset,
         ab_valid => ab_valid,
         ar       => ar,
         ai       => ai,
@@ -130,7 +134,7 @@ begin
   S_accumulate: process(clk)
   begin
     if rising_edge(clk) then
-      if clr = '1' then
+      if reset = '1' then
         sig_mac_r     <= (others => '0');
         sig_mac_i     <= (others => '0');
         sig_mac_valid <= '0';

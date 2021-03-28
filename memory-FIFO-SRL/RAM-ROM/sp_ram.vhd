@@ -7,8 +7,9 @@
 --
 library ieee;
   use ieee.std_logic_1164.all;
-  use ieee.math_real.all;
   use ieee.numeric_std.all;
+library work;
+  use work.util_pkg.all;
 
 entity sp_ram is
   generic (
@@ -22,7 +23,7 @@ entity sp_ram is
     clk          : in  std_logic;
     wr_en        : in  std_logic; -- Write enable
     en           : in  std_logic; -- Enable for overall RAM
-    addr         : in  std_logic_vector(integer(ceil(log2(real(G_DEPTH))))-1 downto 0);
+    addr         : in  std_logic_vector(F_clog2(G_DEPTH)-1 downto 0);
     din          : in  std_logic_vector(G_DATA_WIDTH-1 downto 0);
     dout         : out std_logic_vector(G_DATA_WIDTH-1 downto 0)
   );
@@ -90,7 +91,7 @@ architecture behav of tb_sp_ram is
   signal clk   : std_logic := '0';
   signal wr_en : std_logic := '0'; -- Write enable
   signal en    : std_logic := '1'; -- Enable for overall RAM
-  signal addr  : std_logic_vector(integer(ceil(log2(real(G_DEPTH))))-1 downto 0)
+  signal addr  : std_logic_vector(F_clog2(G_DEPTH)-1 downto 0)
                  := (others => '0');
   signal din   : std_logic_vector(G_DATA_WIDTH-1 downto 0)
                  := (others => '0');
