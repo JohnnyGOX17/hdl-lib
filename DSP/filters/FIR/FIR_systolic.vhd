@@ -4,7 +4,7 @@ library ieee;
 library work;
   use work.util_pkg.all;
 
-entity systolic_FIR is
+entity FIR_systolic is
   generic (
     G_DATA_WIDTH : integer := 16;
     G_NUM_TAPS   : integer :=  4;
@@ -16,9 +16,9 @@ entity systolic_FIR is
     din          : in  std_logic_vector(G_DATA_WIDTH - 1 downto 0);
     dout         : out std_logic_vector(G_DATA_WIDTH - 1 downto 0)
   )
-end entity systolic_FIR;
+end entity FIR_systolic;
 
-architecture rtl of systolic_FIR is
+architecture rtl of FIR_systolic is
 
   signal sig_coef_array : T_slv_2D := F_read_file_slv_2D( G_COEF_PATH,
                                                           G_COEF_WIDTH,
