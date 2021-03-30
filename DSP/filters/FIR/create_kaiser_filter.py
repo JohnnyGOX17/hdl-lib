@@ -1,4 +1,4 @@
-#!python
+#!/usr/bin/env python3
 # based on example: https://scipy-cookbook.readthedocs.io/items/FIRFilter.html
 from numpy import cos, sin, pi, absolute, arange, log10, maximum
 from scipy.signal import kaiserord, lfilter, firwin, freqz
@@ -44,9 +44,6 @@ k = (2**(n_bits - 1))/max(absolute(b))
 # scaled integer coefficients
 b_scaled = b * k
 b_fxp = [round(x) for x in b_scaled]
-
-print(bin(b_fxp[0] & 0b1111111111111111)[2:].zfill(n_bits))
-print(bin(b_fxp[1] & 0b1111111111111111)[2:].zfill(n_bits))
 
 # write out coef to file
 fd = open("coef.txt", "w")
