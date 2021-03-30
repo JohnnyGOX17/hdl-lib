@@ -18,10 +18,9 @@ package util_pkg is
 -- // End: Common Types ///////////////////////////////////////////////////////
 
 -- // Start: File I/O Utilities ///////////////////////////////////////////////
-  -- #TODO
-  --function F_read_file_slv_2D( file_path  : string;
-  --                             slv_length : integer;
-  --                             dim_length : integer ) return T_slv_2D;
+  impure function F_read_file_slv_2D( file_path  : string;
+                                      slv_length : integer;
+                                      dim_length : integer ) return T_slv_2D;
 -- // End: File I/O Utilities /////////////////////////////////////////////////
 
 -- // Start: String Utilities /////////////////////////////////////////////////
@@ -46,26 +45,32 @@ end util_pkg;
 package body util_pkg is
 
 -- // Start: File I/O Utilities ///////////////////////////////////////////////
-  -- #TODO
-  --function F_read_file_slv_2D( file_path  : string;
-  --                             slv_length : integer;
-  --                             dim_length : integer ) return T_slv_2D is
-  --  file     fd       : text;
-  --  variable V_line   : line;
-  --  variable V_bitvec : bit_vector(slv_length - 1 downto 0);
-  --  variable V_return : T_slv_2D(dim_length - 1 downto 0)(slv_length -1 downto 0)
-  --                      := (others => (others => '0'));
-  --begin
-  --  if FilePath /= "" then
-  --    file_open( fd, file_path, read_mode );
-  --    for i in 0 to dim_length - 1 loop
-  --      readline( fd, V_line );
-  --      read( V_line, V_bitvec );
-  --      V_return(i) := to_stdlogicvector( V_bitvec );
-  --    end loop;
-  --  end if;
-  --  return V_return;
-  --end F_read_file_slv_2D;
+  -- Reads an ASCII file with bit-vector patterns on each line where:
+  --   + each line has a single binary value of length `slv_length`
+  --   + reads up to `dim_length` lines of file
+  -- e.x. a file with values `0`, `1`, and `7` is:
+  --      00000000
+  --      00000001
+  --      00000111
+  impure function F_read_file_slv_2D( file_path  : string;
+                                      slv_length : integer;
+                                      dim_length : integer ) return T_slv_2D is
+    file     fd       : text;
+    variable V_line   : line;
+    variable V_bitvec : bit_vector(slv_length - 1 downto 0);
+    variable V_return : T_slv_2D(dim_length - 1 downto 0)(slv_length -1 downto 0)
+                        := (others => (others => '0'));
+  begin
+    if file_path /= "" then
+      file_open( fd, file_path, read_mode );
+      for i in 0 to dim_length - 1 loop
+        readline( fd, V_line );
+        read( V_line, V_bitvec );
+        V_return(i) := to_stdlogicvector( V_bitvec );
+      end loop;
+    end if;
+    return V_return;
+  end F_read_file_slv_2D;
 -- // End: File I/O Utilities /////////////////////////////////////////////////
 
 -- // Start: String Utilities /////////////////////////////////////////////////
