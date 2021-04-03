@@ -13,8 +13,10 @@
 #include <time.h>
 #include <unistd.h>
 
+/* calls into GHDL tb process */
 extern int ghdl_main(int argc, char **argv);
 
+/* buffers for passing packet data to tb */
 static int32_t *p_rx;
 static int32_t *p_tx;
 static const size_t mem_length = 65536;
@@ -23,15 +25,18 @@ int sd_rx;
 int sd_tx;
 int net_ifindex;
 
+/* get() functions mapped to pkg_net.vhd to get pointer to data buffer */
 uint64_t F_get_p_rx() {
 	return *(uint64_t*)&p_rx;
 }
-
 uint64_t F_get_p_tx() {
 	return *(uint64_t*)&p_tx;
 }
 
-/* returns 0 if successful, any other return value is an error */
+/*
+ * Sends given length of data on raw socket from TX buffer and returns status:
+ *	0 == OK, 1 == error
+ */
 uint32_t F_send_pkt(size_t tx_length) {
 	struct sockaddr_ll saddr_ll;
 	saddr_ll.sll_ifindex = net_ifindex;
@@ -45,8 +50,9 @@ uint32_t F_send_pkt(size_t tx_length) {
 	return 0;
 }
 
-/* receives data into RX buffer and returns number of bytes received
- * 0 == error
+/*
+ * Receives data from raw socket into RX buffer and returns number of bytes received:
+ *	0 == error
  */
 uint32_t F_receive_pkt() {
 	struct sockaddr saddr;
@@ -59,6 +65,7 @@ uint32_t F_receive_pkt() {
 	}
 	return rx_len;
 }
+
 
 int main(int argc, char **argv) {
 
@@ -81,6 +88,7 @@ int main(int argc, char **argv) {
 		perror("mmap() of TX buffer failed!\n");
 		return -1;
 	}
+	/* zero out buffers */
 	memset(p_rx, 0, mem_length);
 	memset(p_tx, 0, mem_length);
 
@@ -107,14 +115,14 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 	net_ifindex = ifreq_i.ifr_ifindex;
-	printf("Netdev index for %s: %d\n", argv[1], net_ifindex);
+	printf("Using netdev index %d for interface %s\n", net_ifindex, argv[1]);
 
 
 	/* this app is new main, invoke testbench by calling into ghdl_main */
 	printf("\tStarting GHDL simulation...\n");
 	int gargc = argc - 1; /* don't use netdev name in ghdl */
+	/* GHDL testbench runs from here, returns when sim's done */
 	int ghdl_status = ghdl_main(gargc, argv);
-
 	printf("\tSimulation done!\n");
 
 	/* cleanup */

@@ -2,9 +2,8 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.std_logic_unsigned.all;
   use ieee.numeric_std.all;
-
   use std.textio.all;
-
+library work;
   use work.pkg_net.all;
 
 entity tb_vnic is
@@ -12,7 +11,6 @@ end entity;
 
 architecture behav of tb_vnic is
 begin
-
 
   CS_loopback: process
     variable rx_length : integer := 0;
