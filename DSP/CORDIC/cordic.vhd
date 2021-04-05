@@ -1,3 +1,5 @@
+-- Core logic inspired by Verilog example: https://github.com/cebarnes/cordic
+
 library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
@@ -9,12 +11,13 @@ entity cordic is
   port (
     clk          : in  std_logic;
     valid_in     : in  std_logic;
-    x_start      : in  signed(G_ITERATIONS - 1 downto 0);
-    y_start      : in  signed(G_ITERATIONS - 1 downto 0);
-    angle        : in  signed(31 downto 0);
+    x_in         : in  signed(G_ITERATIONS - 1 downto 0);
+    y_in         : in  signed(G_ITERATIONS - 1 downto 0);
+    angle_in     : in  signed(31 downto 0);               -- 32b phase_in
+
     valid_out    : out std_logic;
-    sine         : out signed(G_ITERATIONS - 1 downto 0);
-    cosine       : out signed(G_ITERATIONS - 1 downto 0)
+    cos_out      : out signed(G_ITERATIONS - 1 downto 0); -- cosine/x_out
+    sin_out      : out signed(G_ITERATIONS - 1 downto 0)  -- sine/y_out
   );
 end entity cordic;
 
@@ -30,7 +33,7 @@ architecture rtl of cordic is
     V_return( 1) := "00010010111001000000010100011101"; -- 26.565 degrees -> atan(2^-1)
     V_return( 2) := "00001001111110110011100001011011"; -- 14.036 degrees -> atan(2^-2)
     V_return( 3) := "00000101000100010001000111010100"; -- atan(2^-3)
-    V_return( 4) := "00000010100010110000110101000011";
+    V_return( 4) := "00000010100010110000110101000011"; -- ...
     V_return( 5) := "00000001010001011101011111100001";
     V_return( 6) := "00000000101000101111011000011110";
     V_return( 7) := "00000000010100010111110001010101";
@@ -69,8 +72,8 @@ architecture rtl of cordic is
 begin
 
   valid_out <= sig_valid_sr(sig_valid_sr'high);
-  cosine    <= resize( x(G_ITERATIONS - 1), sine'length );
-  sine      <= resize( y(G_ITERATIONS - 1), cosine'length );
+  cos_out   <= resize( x(G_ITERATIONS - 1), cos_out'length );
+  sin_out   <= resize( y(G_ITERATIONS - 1), sin_out'length );
 
   S_shift_reg_valid: process(clk)
   begin
@@ -83,19 +86,19 @@ begin
   S_quad: process(clk)
   begin
     if rising_edge(clk) then
-      case angle(31 downto 30) is -- account for angles in different quads
+      case angle_in(31 downto 30) is -- account for angles in different quads
         when "00" | "11" => -- no changes needed for these quadrants
-          x(0) <= resize( x_start, G_ITERATIONS + 1 );
-          y(0) <= resize( y_start, G_ITERATIONS + 1 );
-          z(0) <= angle;
+          x(0) <= resize( x_in, G_ITERATIONS + 1 );
+          y(0) <= resize( y_in, G_ITERATIONS + 1 );
+          z(0) <= angle_in;
         when "01" =>
-          x(0) <= -resize( y_start, G_ITERATIONS + 1 );
-          y(0) <=  resize( x_start, G_ITERATIONS + 1 );
-          z(0) <= "00" & angle(29 downto 0); -- subtract pi/2 for angle in this quad
+          x(0) <= -resize( y_in, G_ITERATIONS + 1 );
+          y(0) <=  resize( x_in, G_ITERATIONS + 1 );
+          z(0) <= "00" & angle_in(29 downto 0); -- subtract pi/2 for angle in this quad
         when "10" =>
-          x(0) <=  resize( y_start, G_ITERATIONS + 1 );
-          y(0) <= -resize( x_start, G_ITERATIONS + 1 );
-          z(0) <= "11" & angle(29 downto 0); -- add pi/2 for angle in this quad
+          x(0) <=  resize( y_in, G_ITERATIONS + 1 );
+          y(0) <= -resize( x_in, G_ITERATIONS + 1 );
+          z(0) <= "11" & angle_in(29 downto 0); -- add pi/2 for angle in this quad
         when others =>
       end case;
     end if;
