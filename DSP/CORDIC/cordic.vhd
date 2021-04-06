@@ -122,3 +122,4 @@ begin
   end generate UG_intermediate;
 
 end architecture rtl;
+
