@@ -12,7 +12,8 @@ print('CORDIC Processing Gain of component: %0.8f' % processing_gain)
 
 # Convert angle (in degrees) to signed integer value for input to CORDIC block
 def degree_to_signed_fxp( angle, bitwidth ):
-    return round( (angle/360.0) * (2**bitwidth) )
+    wrapped_angle = angle % 360.0
+    return int(np.floor( (wrapped_angle/360.0) * (2**bitwidth) ))
 
 # Rotation Mode Tests ---------------------------------------------------------
 # https://en.wikipedia.org/wiki/CORDIC#Rotation_mode
