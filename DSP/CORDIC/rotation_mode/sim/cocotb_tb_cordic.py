@@ -20,7 +20,7 @@ INPUT_MIN = -(2**(data_bitwidth-1))
 INPUT_MAX =  (2**(data_bitwidth-1) - 1)
 # sim variables
 num_angles = 30 # number of subdivided angles to test from 0-360deg
-tol_error  = 2  # % error tolerance for CORDIC outputs
+tol_error  = 3  # % error tolerance for CORDIC outputs (% error grows with low input magnitudes or 0/90deg angles)
 
 # Calc CORDIC processing gain: https://en.wikipedia.org/wiki/CORDIC#Rotation_mode
 processing_gain = 1
@@ -41,7 +41,7 @@ def to_fixed_signed_int(val, bitwidth):
     return ret_val
 
 @cocotb.test()
-async def test_complex_multiply(dut):
+async def test_CORDIC_rotations(dut):
     """ Validate CORDIC trig functions"""
 
     clk = Clock(dut.clk, 10, units="ns") # create 10ns period clock on input port `clk`
