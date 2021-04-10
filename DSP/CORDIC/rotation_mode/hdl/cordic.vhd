@@ -24,10 +24,10 @@ end entity cordic;
 architecture rtl of cordic is
 
   type T_sign_iter is array (integer range<>) of signed(G_ITERATIONS downto 0);
-  type T_sign_31   is array (integer range<>) of signed(31 downto 0);
+  type T_sign_32b  is array (integer range<>) of signed(31 downto 0);
 
-  function F_init_atan_LUT return T_sign_31 is
-    variable V_return : T_sign_31(30 downto 0);
+  function F_init_atan_LUT return T_sign_32b is
+    variable V_return : T_sign_32b(30 downto 0);
   begin
     V_return( 0) := "00100000000000000000000000000000"; -- 45.000 degrees -> atan(2^0)
     V_return( 1) := "00010010111001000000010100011101"; -- 26.565 degrees -> atan(2^-1)
@@ -63,9 +63,9 @@ architecture rtl of cordic is
     return V_return;
   end F_init_atan_LUT;
 
-  signal atan_LUT : T_sign_31(30 downto 0) := F_init_atan_LUT;
+  signal atan_LUT : T_sign_32b(30 downto 0) := F_init_atan_LUT;
   signal x, y     : T_sign_iter(G_ITERATIONS - 1 downto 0) := (others => (others => '0'));
-  signal z        :   T_sign_31(G_ITERATIONS - 1 downto 0) := (others => (others => '0'));
+  signal z        :  T_sign_32b(G_ITERATIONS - 1 downto 0) := (others => (others => '0'));
 
   signal sig_valid_sr : std_logic_vector(G_ITERATIONS - 1 downto 0) := (others => '0');
 

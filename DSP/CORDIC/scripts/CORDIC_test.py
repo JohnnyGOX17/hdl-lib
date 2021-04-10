@@ -47,8 +47,6 @@ test_x = [5000]
 test_y = [2000]
 for x_in, y_in in zip(test_x, test_y):
     print('X: %d, Y: %d' % (x_in, y_in))
-    print('Final X: %d' % round(processing_gain*x_in))
-    print('Final Y?: %d' % round(processing_gain*y_in))
     print('Mag: %d' % round(processing_gain*np.sqrt(x_in**2 + y_in**2)))
     phase = degree_to_signed_fxp(np.rad2deg(np.arctan2(y_in, x_in)), ang_bitwidth)
     print(phase)

@@ -104,8 +104,8 @@ async def test_CORDIC_rotations(dut):
             y_error   = 100*(dut_y_out - sin_est)/sin_est
         dut._log.info("DUT X_out: %d (%0.2f%% Error)" % (dut_x_out, x_error))
         dut._log.info("DUT Y_out: %d (%0.2f%% Error)\n" % (dut_y_out, y_error))
-        assert x_error < tol_error, "Error between true & predicted X_out value greater than tolerance of {}%!".format(tol_error)
-        assert y_error < tol_error, "Error between true & predicted Y_out value greater than tolerance of {}%!".format(tol_error)
+        assert abs(x_error) < tol_error, "Error between true & predicted X_out value greater than tolerance of {}%!".format(tol_error)
+        assert abs(y_error) < tol_error, "Error between true & predicted Y_out value greater than tolerance of {}%!".format(tol_error)
 
     # SIM END -----------------------------------------------------------------
     await Timer(1, units='ns') # example of waiting 1ns
