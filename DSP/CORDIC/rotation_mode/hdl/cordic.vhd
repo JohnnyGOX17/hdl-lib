@@ -6,14 +6,15 @@ library ieee;
 
 entity cordic is
   generic (
-    G_ITERATIONS : integer := 16 -- also equates to output precision
+    G_ITERATIONS : natural := 16 -- also equates to output precision
   );
   port (
     clk          : in  std_logic;
+    reset        : in  std_logic := '0'; -- (optional) sync reset for *valid's
     valid_in     : in  std_logic;
     x_in         : in  signed(G_ITERATIONS - 1 downto 0);
     y_in         : in  signed(G_ITERATIONS - 1 downto 0);
-    angle_in     : in  signed(31 downto 0);               -- 32b phase_in
+    angle_in     : in  unsigned(31 downto 0);             -- 32b phase_in (0-360deg)
 
     valid_out    : out std_logic;
     cos_out      : out signed(G_ITERATIONS - 1 downto 0); -- cosine/x_out
@@ -23,12 +24,13 @@ end entity cordic;
 
 architecture rtl of cordic is
 
-  type T_sign_iter is array (integer range<>) of signed(G_ITERATIONS downto 0);
-  type T_sign_32b  is array (integer range<>) of signed(31 downto 0);
+  type T_sign_iter  is array (integer range<>) of signed(G_ITERATIONS downto 0);
+  type T_unsign_32b is array (integer range<>) of unsigned(31 downto 0);
 
-  function F_init_atan_LUT return T_sign_32b is
-    variable V_return : T_sign_32b(30 downto 0);
+  function F_init_atan_LUT return T_unsign_32b is
+    variable V_return : T_unsign_32b(30 downto 0);
   begin
+    -- +/-90deg angle rotation already accounted for in S_quad input stage
     V_return( 0) := "00100000000000000000000000000000"; -- 45.000 degrees -> atan(2^0)
     V_return( 1) := "00010010111001000000010100011101"; -- 26.565 degrees -> atan(2^-1)
     V_return( 2) := "00001001111110110011100001011011"; -- 14.036 degrees -> atan(2^-2)
@@ -63,9 +65,10 @@ architecture rtl of cordic is
     return V_return;
   end F_init_atan_LUT;
 
-  signal atan_LUT : T_sign_32b(30 downto 0) := F_init_atan_LUT;
-  signal x, y     : T_sign_iter(G_ITERATIONS - 1 downto 0) := (others => (others => '0'));
-  signal z        :  T_sign_32b(G_ITERATIONS - 1 downto 0) := (others => (others => '0'));
+  signal atan_LUT : T_unsign_32b(30 downto 0) := F_init_atan_LUT;
+
+  signal x, y     :  T_sign_iter(G_ITERATIONS - 1 downto 0) := (others => (others => '0'));
+  signal z        : T_unsign_32b(G_ITERATIONS - 1 downto 0) := (others => (others => '0'));
 
   signal sig_valid_sr : std_logic_vector(G_ITERATIONS - 1 downto 0) := (others => '0');
 
@@ -81,7 +84,11 @@ begin
   begin
     if rising_edge(clk) then
       -- shift register to delay data valid to match pipeline delay
-      sig_valid_sr <= sig_valid_sr(G_ITERATIONS - 2 downto 0) & valid_in;
+      if reset = '1' then
+        sig_valid_sr <= (others => '0');
+      else
+        sig_valid_sr <= sig_valid_sr(G_ITERATIONS - 2 downto 0) & valid_in;
+      end if;
     end if;
   end process S_shift_reg_valid;
 

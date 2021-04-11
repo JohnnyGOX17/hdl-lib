@@ -15,7 +15,7 @@ architecture behav of tb_cordic is
   signal valid_in  : std_logic := '0';
   signal x_in      : signed(G_ITERATIONS - 1 downto 0) := (others => '0');
   signal y_in      : signed(G_ITERATIONS - 1 downto 0) := (others => '0');
-  signal angle_in  : signed(31 downto 0) := (others => '0');
+  signal angle_in  : unsigned(31 downto 0) := (others => '0');
   signal valid_out : std_logic;
   signal sin_out   : signed(G_ITERATIONS - 1 downto 0);
   signal cos_out   : signed(G_ITERATIONS - 1 downto 0);
@@ -72,7 +72,7 @@ begin
     -- angle_in = 60 deg => 60/360 * 2^32 = 715,827,882.7
     --   => 32'b00101010101010101010101010101010
     --angle_in <= "00101010_10101010_10101010_10101010";
-    angle_in <= to_signed( 715827882, 32 );
+    angle_in <= to_unsigned( 715827882, 32 );
     x_in     <= to_signed( 5000, G_ITERATIONS ); -- arbitrary magnitude input
     valid_in <= '1';
     wait until rising_edge(clk);
@@ -86,16 +86,6 @@ begin
     --// angle_in = 'b01000000000000000000000000000000; // 90 deg
 
     --// angle_in = 'b00110101010101010101010101010101; // 75 deg
-
-
-    angle_in <= to_signed( 0, 32 );
-    x_in     <= to_signed( 5000, G_ITERATIONS ); -- arbitrary magnitude input
-    y_in     <= to_signed( 2000, G_ITERATIONS ); -- arbitrary magnitude input
-    valid_in <= '1';
-    wait until rising_edge(clk);
-    valid_in <= '0';
-    wait until rising_edge(clk) and valid_out = '1';
-
 
     wait for 250 ns;
     sim_end <= true;

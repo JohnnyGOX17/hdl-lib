@@ -16,7 +16,7 @@ architecture behav of tb_cordic_vec is
   signal x_in      : signed(G_ITERATIONS - 1 downto 0) := (others => '0');
   signal y_in      : signed(G_ITERATIONS - 1 downto 0) := (others => '0');
   signal valid_out : std_logic;
-  signal phase_out : signed(31 downto 0);
+  signal phase_out : unsigned(31 downto 0);
   signal mag_out   : signed(G_ITERATIONS - 1 downto 0);
   signal sim_end   : boolean := false;
 

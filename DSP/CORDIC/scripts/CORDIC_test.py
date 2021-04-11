@@ -9,9 +9,13 @@ for i in range(data_bitwidth):
     processing_gain *= np.sqrt(1.0 + (2.0**(-2.0*i)))
 
 print('CORDIC Processing Gain of component: %0.8f' % processing_gain)
+fxp_scale_factor = int(np.floor((1/processing_gain)*(2**data_bitwidth)))
+print('\tTo cancel gain (scale of %0.8f) for %d bit outputs:\n\t\t- Multiply by 0x%X (%d unsigned)\n\t\t- Then shift right by %d bits' % (1/processing_gain, data_bitwidth, fxp_scale_factor, fxp_scale_factor, data_bitwidth))
 
-# Convert angle (in degrees) to signed integer value for input to CORDIC block
-def degree_to_signed_fxp( angle, bitwidth ):
+# Convert angle (in degrees) to unsigned integer value for input to CORDIC block
+def degree_to_unsigned_fxp( angle, bitwidth ):
+    # Python mod operator works with FP and constrains to positive values:
+    #   e.x. -45deg input angle -> 315deg wrapped angle
     wrapped_angle = angle % 360.0
     return int(np.floor( (wrapped_angle/360.0) * (2**bitwidth) ))
 
@@ -26,7 +30,7 @@ magnitudes  = [19429, 5000]
 test_angles = [45, 60]
 for x_in, ang in zip(magnitudes, test_angles):
     print('%d deg input angle value: %d' % (ang,
-        degree_to_signed_fxp(ang, ang_bitwidth)) )
+        degree_to_unsigned_fxp(ang, ang_bitwidth)) )
     cos_est = round(processing_gain*x_in*np.cos(np.deg2rad(ang)))
     sin_est = round(processing_gain*x_in*np.sin(np.deg2rad(ang)))
     print('\t%d*Cos(%d) [X] ~= %d' % (x_in, ang, cos_est))
@@ -48,7 +52,7 @@ test_y = [2000]
 for x_in, y_in in zip(test_x, test_y):
     print('X: %d, Y: %d' % (x_in, y_in))
     print('Mag: %d' % round(processing_gain*np.sqrt(x_in**2 + y_in**2)))
-    phase = degree_to_signed_fxp(np.rad2deg(np.arctan2(y_in, x_in)), ang_bitwidth)
+    phase = degree_to_unsigned_fxp(np.rad2deg(np.arctan2(y_in, x_in)), ang_bitwidth)
     print(phase)
     print( hex(phase) )
 

@@ -27,8 +27,10 @@ processing_gain = 1
 for i in range(data_bitwidth):
     processing_gain *= np.sqrt(1.0 + (2.0**(-2.0*i)))
 
-# Convert angle (in degrees) to signed integer value for input to CORDIC block
-def degree_to_signed_fxp( angle, bitwidth ):
+# Convert angle (in degrees) to unsigned integer value for input to CORDIC block
+def degree_to_unsigned_fxp( angle, bitwidth ):
+    # Python mod operator works with FP and constrains to positive values:
+    #   e.x. -45deg input angle -> 315deg wrapped angle
     wrapped_angle = angle % 360.0
     return int(np.floor( (wrapped_angle/360.0) * (2**bitwidth) ))
 
@@ -64,7 +66,7 @@ async def test_CORDIC_rotations(dut):
     for ang in test_angles:
         await RisingEdge(dut.clk) # start tests synchronous with input clk
 
-        input_angle   = degree_to_signed_fxp(ang, ang_bitwidth)
+        input_angle   = degree_to_unsigned_fxp(ang, ang_bitwidth)
         dut.angle_in <= input_angle # assign value to DUT
         dut._log.info('%0.2f deg input angle value: %d' % (ang, input_angle) )
 
