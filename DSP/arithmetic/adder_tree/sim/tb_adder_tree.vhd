@@ -1,11 +1,19 @@
+--synthesis translate_off
+
 -- Sim Parallel Adder Tree w/recursion (VHDL-2008)
 library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
 library work;
   use work.util_pkg.all;
+-- Setup tb for use with VUnit
+library vunit_lib;
+context vunit_lib.vunit_context;
 
 entity tb_adder_tree is
+  generic (
+    runner_cfg   : string -- VUnit generic interface
+  );
 end tb_adder_tree;
 
 architecture behav of tb_adder_tree is
@@ -36,6 +44,9 @@ begin
     variable accum_even : integer := 0;
     variable accum_odd  : integer := 0;
   begin
+
+    test_runner_setup(runner, runner_cfg); -- VUnit entry call
+
     wait until reset = '0';
     wait until rising_edge(clk);
 
@@ -62,6 +73,7 @@ begin
     din_valid_odd  <= '0';
 
     wait for 200 ns;
+    test_runner_cleanup(runner); -- VUnit exit call, sim ends here
     sim_end <= true;
     wait;
   end process CS_data_inputs;
@@ -122,3 +134,4 @@ begin
 
 end architecture behav;
 
+--synthesis translate_on

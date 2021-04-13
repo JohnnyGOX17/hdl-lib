@@ -8,7 +8,7 @@ entity FIR_systolic is
   generic (
     G_DATA_WIDTH : integer := 16;
     G_NUM_TAPS   : integer :=  4;
-    G_COEF_PATH  : string  := "";
+    G_COEF_PATH  : string  := "../scripts/coef.txt";
     G_COEF_WIDTH : integer := 16
   );
   port (

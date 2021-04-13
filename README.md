@@ -41,7 +41,7 @@ Library of common and re-use components and HDL code.
 
 ## Testing / Verification
 
-### VUnit
+### VUnit Regression Tests
 
-Run `python run.py -v`
+Run `$ python3 run.py` (or `$ python3 run.py -v` for verbose logging from testbench outputs) to kick off VUnit regression tests.
 
