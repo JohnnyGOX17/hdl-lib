@@ -28,10 +28,10 @@ entity boundary_cell is
     CORDIC_scale : in  signed(G_DATA_WIDTH - 1 downto 0) := X"4DBA";
     lambda       : in  signed(G_DATA_WIDTH - 1 downto 0) := X"7EB8";
 
-    I_in         : in  signed(G_DATA_WIDTH - 1 downto 0); -- real
-    Q_in         : in  signed(G_DATA_WIDTH - 1 downto 0); -- imag
-    IQ_valid_in  : in  std_logic;
-    IQ_ready     : out std_logic;
+    x_real       : in  signed(G_DATA_WIDTH - 1 downto 0); -- real
+    x_imag       : in  signed(G_DATA_WIDTH - 1 downto 0); -- imag
+    x_valid      : in  std_logic;
+    x_ready      : out std_logic;
 
     phi_out      : out signed(G_DATA_WIDTH - 1 downto 0);
     theta_out    : out signed(G_DATA_WIDTH - 1 downto 0);
@@ -97,7 +97,7 @@ architecture rtl of boundary_cell is
 
 begin
 
-  IQ_ready     <= '1' when sig_bc_state = S_IDLE else '0';
+  x_ready      <= '1' when sig_bc_state = S_IDLE else '0';
   phi_out      <= sig_phi_out_scl;
   theta_out    <= sig_theta_out_scl;
   bc_valid_out <= '1' when sig_bc_state = S_OUT_VALID else '0';
@@ -109,9 +109,9 @@ begin
     port map (
       clk          => clk,
       reset        => reset,
-      valid_in     => IQ_valid_in,
-      x_in         => I_in,
-      y_in         => Q_in,
+      valid_in     => x_valid,
+      x_in         => x_real,
+      y_in         => x_imag,
 
       valid_out    => sig_input_vec_valid,
       phase_out    => sig_phi_out,      -- phi = atan2(Q, I)
@@ -234,7 +234,7 @@ begin
       else
         case sig_bc_state is
           when S_IDLE =>
-            if IQ_valid_in = '1' then
+            if x_valid = '1' then
               sig_bc_state <= S_WAIT_PHI;
             end if;
 

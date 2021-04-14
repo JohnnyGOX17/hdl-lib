@@ -16,10 +16,10 @@ architecture behav of tb_boundary_cell is
   -- default is lambda = 0.99
   signal lambda       : signed(G_DATA_WIDTH - 1 downto 0) := X"7EB8";
 
-  signal I_in         : signed(G_DATA_WIDTH - 1 downto 0) := (others => '0'); -- real
-  signal Q_in         : signed(G_DATA_WIDTH - 1 downto 0) := (others => '0'); -- imag
-  signal IQ_valid_in  : std_logic := '0';
-  signal IQ_ready     : std_logic;
+  signal x_real       : signed(G_DATA_WIDTH - 1 downto 0) := (others => '0'); -- real
+  signal x_imag       : signed(G_DATA_WIDTH - 1 downto 0) := (others => '0'); -- imag
+  signal x_valid      : std_logic := '0';
+  signal x_ready      : std_logic;
 
   signal phi_out      : signed(G_DATA_WIDTH - 1 downto 0);
   signal theta_out    : signed(G_DATA_WIDTH - 1 downto 0);
@@ -39,10 +39,10 @@ begin
       reset        => reset,
       CORDIC_scale => CORDIC_scale,
       lambda       => lambda,
-      I_in         => I_in,
-      Q_in         => Q_in,
-      IQ_valid_in  => IQ_valid_in,
-      IQ_ready     => IQ_ready,
+      x_real       => x_real,
+      x_imag       => x_imag,
+      x_valid      => x_valid,
+      x_ready      => x_ready,
       phi_out      => phi_out,
       theta_out    => theta_out,
       bc_valid_out => bc_valid_out,
@@ -61,15 +61,19 @@ begin
 
     -- test some arbitrary I/Q input
     wait until rising_edge(clk);
-    I_in        <= to_signed(  4000, G_DATA_WIDTH );
-    Q_in        <= to_signed( -2000, G_DATA_WIDTH );
-    IQ_valid_in <= '1';
-    wait until IQ_ready = '1' and rising_edge(clk);
-    I_in        <= (others => '0');
-    Q_in        <= (others => '0');
-    IQ_valid_in <= '0';
+    x_real  <= to_signed(  4000, G_DATA_WIDTH );
+    x_imag  <= to_signed( -2000, G_DATA_WIDTH );
+    x_valid <= '1';
+    wait until x_ready = '1' and rising_edge(clk);
+    x_real  <= (others => '0');
+    x_imag  <= (others => '0');
+    x_valid <= '0';
 
-    wait for 1 us;
+    wait until bc_valid_out = '1' and rising_edge(clk);
+    report "Phi Out: " & integer'image(to_integer(phi_out)) & " [0x" & to_hstring(phi_out) & "]";
+    report "Theta Out: " & integer'image(to_integer(theta_out)) & " [0x" & to_hstring(theta_out) & "]";
+
+    wait for 100 ns;
     sim_end <= true;
     wait;
   end process CS_test_inputs;
