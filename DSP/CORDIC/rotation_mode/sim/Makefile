@@ -61,6 +61,13 @@ ghdl:
 	ghdl -r tb_$(TOPLEVEL) --wave=output.ghw
 	gtkwave output.ghw
 
+ghdl-scaled:
+	ghdl -a $(PWD)/../hdl/cordic.vhd $(PWD)/../hdl/cordic_rot_scaled.vhd $(PWD)/tb_cordic_rot_scaled.vhd
+	ghdl -e tb_cordic_rot_scaled
+	ghdl -r tb_cordic_rot_scaled --wave=output.ghw
+	gtkwave output.ghw
+
+
 # Profiling of test execution (copied from https://github.com/cocotb/cocotb/blob/master/examples/matrix_multiplier/tests/Makefile)
 DOT_BINARY ?= dot
 

@@ -4,7 +4,7 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
 
-entity cordic_rot_scaled is
+entity cordic_vec_scaled is
   generic (
     G_ITERATIONS : natural := 16 -- also equates to output precision
   );
@@ -14,18 +14,17 @@ entity cordic_rot_scaled is
     valid_in     : in  std_logic;
     x_in         : in  signed(G_ITERATIONS - 1 downto 0);
     y_in         : in  signed(G_ITERATIONS - 1 downto 0);
-    angle_in     : in  unsigned(31 downto 0);             -- 32b phase_in (0-360deg)
     CORDIC_scale : in  signed(G_ITERATIONS - 1 downto 0) := X"4DBA";
 
     valid_out    : out std_logic;
-    cos_out      : out signed(G_ITERATIONS - 1 downto 0); -- cosine/x_out
-    sin_out      : out signed(G_ITERATIONS - 1 downto 0)  -- sine/y_out
+    phase_out    : out unsigned(31 downto 0); -- 32b phase (0-360deg)
+    mag_out      : out signed(G_ITERATIONS - 1 downto 0)
   );
-end entity cordic_rot_scaled;
+end entity cordic_vec_scaled;
 
-architecture rtl of cordic_rot_scaled is
+architecture rtl of cordic_vec_scaled is
 
-  component cordic is
+  component cordic_vec is
     generic (
       G_ITERATIONS : natural := 16 -- also equates to output precision
     );
@@ -35,33 +34,32 @@ architecture rtl of cordic_rot_scaled is
       valid_in     : in  std_logic;
       x_in         : in  signed(G_ITERATIONS - 1 downto 0);
       y_in         : in  signed(G_ITERATIONS - 1 downto 0);
-      angle_in     : in  unsigned(31 downto 0);             -- 32b phase_in (0-360deg)
 
       valid_out    : out std_logic;
-      cos_out      : out signed(G_ITERATIONS - 1 downto 0); -- cosine/x_out
-      sin_out      : out signed(G_ITERATIONS - 1 downto 0)  -- sine/y_out
+      phase_out    : out unsigned(31 downto 0); -- 32b phase (0-360deg)
+      mag_out      : out signed(G_ITERATIONS - 1 downto 0)
     );
-  end component cordic;
+  end component cordic_vec;
 
   signal sig_valid_out : std_logic := '0';
-  signal sig_cos_out   : signed(G_ITERATIONS - 1 downto 0); -- cosine/x_out
-  signal sig_sin_out   : signed(G_ITERATIONS - 1 downto 0); -- sine/y_out
+  signal sig_mag_out   : signed(G_ITERATIONS - 1 downto 0);
+  signal sig_phase_out : unsigned(31 downto 0);
 
   signal sig_scl_valid : std_logic := '0';
-  signal sig_cos_scl   : signed((2*G_ITERATIONS) - 1 downto 0);
-  signal sig_sin_scl   : signed((2*G_ITERATIONS) - 1 downto 0);
+  signal sig_mag_scl   : signed((2*G_ITERATIONS) - 1 downto 0);
+  signal sig_phase_q   : unsigned(31 downto 0);
 
   signal sig_sft_valid : std_logic := '0';
-  signal sig_cos_sft   : signed(G_ITERATIONS - 1 downto 0);
-  signal sig_sin_sft   : signed(G_ITERATIONS - 1 downto 0);
+  signal sig_mag_sft   : signed(G_ITERATIONS - 1 downto 0);
+  signal sig_phase_qq  : unsigned(31 downto 0);
 
 begin
 
   valid_out <= sig_sft_valid;
-  cos_out   <= sig_cos_sft;
-  sin_out   <= sig_sin_sft;
+  phase_out <= sig_phase_qq;
+  mag_out   <= sig_mag_sft;
 
-  U_CORDIC_rotation: cordic
+  U_CORDIC_vectoring: cordic_vec
     generic map (
       G_ITERATIONS => G_ITERATIONS
     )
@@ -71,10 +69,10 @@ begin
       valid_in     => valid_in,
       x_in         => x_in,
       y_in         => y_in,
-      angle_in     => angle_in,
+
       valid_out    => sig_valid_out,
-      cos_out      => sig_cos_out,
-      sin_out      => sig_sin_out
+      phase_out    => sig_phase_out,
+      mag_out      => sig_mag_out
     );
 
   S_scale_magnitudes: process(clk)
@@ -89,23 +87,24 @@ begin
       else
         -- normalize/cancel CORDIC gain using given scale factor
         if sig_valid_out = '1' then
-          sig_cos_scl <= sig_cos_out * CORDIC_scale;
-          sig_sin_scl <= sig_sin_out * CORDIC_scale;
+          sig_mag_scl <= sig_mag_out * CORDIC_scale;
         end if;
         sig_scl_valid <= sig_valid_out;
+        -- since we don't care about scaling phase (for now, interacts with
+        -- other CORDIC/trig functions at full 32b width) just pipeline to
+        -- match delay of scale & shift of magnitude signal
+        sig_phase_q   <= sig_phase_out;
 
         -- scale normalized CORDIC magnitude back down to operational data width
         if sig_scl_valid = '1' then
           -- since scaling & data are always of same data width, can simply shift right
           -- by >> G_ITERATIONS value (-1 data width since given signed scale factor)
-          sig_cos_sft <= resize( shift_right( sig_cos_scl,
+          sig_mag_sft <= resize( shift_right( sig_mag_scl,
                                               G_ITERATIONS - 1 ),
-                                 sig_cos_sft'length );
-          sig_sin_sft <= resize( shift_right( sig_sin_scl,
-                                              G_ITERATIONS - 1 ),
-                                 sig_sin_sft'length );
+                                 sig_mag_sft'length );
         end if;
         sig_sft_valid <= sig_scl_valid;
+        sig_phase_qq  <= sig_phase_q;
 
       end if;
     end if;

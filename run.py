@@ -7,10 +7,16 @@ vu = VUnit.from_argv()
 lib = vu.add_library("lib")
 
 # Add all files ending in *.vhd to library "lib"
-#lib.add_source_files("./vhdl/*/*.vhd")
+# #TODO: Eventually use blob pattern to include all? -> lib.add_source_files("./vhdl/*/*.vhd")
 lib.add_source_files("./util/*.vhd")
 lib.add_source_files("./DSP/arithmetic/adder_tree/hdl/adder_tree.vhd")
 lib.add_source_files("./DSP/arithmetic/adder_tree/sim/tb_adder_tree.vhd")
+lib.add_source_files("./DSP/CORDIC/rotation_mode/hdl/cordic.vhd")
+lib.add_source_files("./DSP/CORDIC/rotation_mode/hdl/cordic_rot_scaled.vhd")
+lib.add_source_files("./DSP/CORDIC/rotation_mode/sim/tb_cordic_rot_scaled.vhd")
+lib.add_source_files("./DSP/CORDIC/vectoring_mode/hdl/cordic_vec.vhd")
+lib.add_source_files("./DSP/CORDIC/vectoring_mode/hdl/cordic_vec_scaled.vhd")
+lib.add_source_files("./DSP/CORDIC/vectoring_mode/sim/tb_cordic_vec_scaled.vhd")
 lib.add_source_files("./memory-FIFO-SRL/RAM-ROM/*.vhd")
 
 # GHDL options
