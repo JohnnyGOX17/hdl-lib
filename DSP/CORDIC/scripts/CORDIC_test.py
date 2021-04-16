@@ -9,8 +9,13 @@ for i in range(data_bitwidth):
     processing_gain *= np.sqrt(1.0 + (2.0**(-2.0*i)))
 
 print('CORDIC Processing Gain of component: %0.8f' % processing_gain)
-fxp_scale_factor = int(np.floor((1/processing_gain)*(2**data_bitwidth)))
-print('\tTo cancel gain (scale of %0.8f) for %d bit outputs:\n\t\t- Multiply by 0x%X (%d unsigned)\n\t\t- Then shift right by %d bits' % (1/processing_gain, data_bitwidth, fxp_scale_factor, fxp_scale_factor, data_bitwidth))
+u_scale_factor = int(np.floor((1/processing_gain)*(2**data_bitwidth)))
+s_scale_factor = int(np.floor((1/processing_gain)*(2**(data_bitwidth-1))))
+print('\tTo cancel gain (scale of %0.8f) for %d bit outputs:' % (1/processing_gain, data_bitwidth))
+print('\t\t- Multiply by 0x%X (%d unsigned)' % (u_scale_factor, u_scale_factor))
+print('\t\t\t- Then shift right (>>) by %d bits' % (data_bitwidth))
+print('\t\t- Or multiply by 0x%X (%d signed)' % (s_scale_factor, s_scale_factor))
+print('\t\t\t- Then shift right (>>) by %d bits' % (data_bitwidth - 1))
 
 # Convert angle (in degrees) to unsigned integer value for input to CORDIC block
 def degree_to_unsigned_fxp( angle, bitwidth ):
