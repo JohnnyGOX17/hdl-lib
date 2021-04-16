@@ -34,12 +34,12 @@ for I_in, Q_in in zip(test_I, test_Q):
     # 1st CORDIC vectoring engine
     input_vec_mag = round(np.sqrt(I_in**2 + Q_in**2))
     print("Input Vector Magnitude: %d" % input_vec_mag)
-    phi = degree_to_unsigned_fxp(np.rad2deg(np.arctan2(Q_in, I_in)), data_bitwidth)
+    phi = degree_to_unsigned_fxp(np.rad2deg(np.arctan2(Q_in, I_in)), ang_bitwidth)
     print("Input Vector Phase: %d" % phi)
 
     # 2nd CORDIC vectoring engine
     theta = degree_to_unsigned_fxp(np.rad2deg(np.arctan2(input_vec_mag, mag_feedback)),
-                                   data_bitwidth)
+                                   ang_bitwidth)
     mag_feedback = round(np.sqrt(mag_feedback**2 + input_vec_mag**2))
 
     print("Phi: 0x%X" % phi)

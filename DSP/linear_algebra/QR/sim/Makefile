@@ -58,7 +58,7 @@ clean-all:
 	rm -f tb_boundary_cell
 
 ghdl-bc:
-	ghdl -a --std=08 $(PWD)/../../../CORDIC/vectoring_mode/hdl/cordic_vec.vhd $(PWD)/../hdl/boundary_cell.vhd $(PWD)/tb_boundary_cell.vhd
+	ghdl -a --std=08 $(PWD)/../../../CORDIC/vectoring_mode/hdl/cordic_vec.vhd $(PWD)/../../../CORDIC/vectoring_mode/hdl/cordic_vec_scaled.vhd $(PWD)/../hdl/boundary_cell.vhd $(PWD)/tb_boundary_cell.vhd
 	ghdl -e --std=08 tb_boundary_cell
 	ghdl -r tb_boundary_cell --wave=output.ghw
 	gtkwave output.ghw

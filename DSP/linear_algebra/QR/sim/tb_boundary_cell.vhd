@@ -21,8 +21,8 @@ architecture behav of tb_boundary_cell is
   signal x_valid      : std_logic := '0';
   signal x_ready      : std_logic;
 
-  signal phi_out      : signed(G_DATA_WIDTH - 1 downto 0);
-  signal theta_out    : signed(G_DATA_WIDTH - 1 downto 0);
+  signal phi_out      : unsigned(31 downto 0);
+  signal theta_out    : unsigned(31 downto 0);
   signal bc_valid_out : std_logic;
   signal ic_ready     : std_logic := '0'; -- downstream internal cell (IC) ready to consume
   signal sim_end      : boolean := false;
@@ -70,8 +70,10 @@ begin
     x_valid <= '0';
 
     wait until bc_valid_out = '1' and rising_edge(clk);
-    report "Phi Out: " & integer'image(to_integer(phi_out)) & " [0x" & to_hstring(phi_out) & "]";
-    report "Theta Out: " & integer'image(to_integer(theta_out)) & " [0x" & to_hstring(theta_out) & "]";
+    -- NOTE: the current phi & theta output values are truncated due to issues
+    --       with trying to represent an unsigned 32b integer directly in GHDL
+    report "Phi Out: " & integer'image(to_integer(phi_out(30 downto 0))) & " [0x" & to_hstring(phi_out) & "]";
+    report "Theta Out: " & integer'image(to_integer(theta_out(30 downto 0))) & " [0x" & to_hstring(theta_out) & "]";
 
     wait for 100 ns;
     sim_end <= true;
