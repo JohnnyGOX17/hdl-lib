@@ -56,11 +56,18 @@ clean-all:
 	rm -f $(TOPLEVEL)
 	rm -f tb_$(TOPLEVEL)
 	rm -f tb_boundary_cell
+	rm -f tb_internal_cell
 
 ghdl-bc:
 	ghdl -a --std=08 $(PWD)/../../../CORDIC/vectoring_mode/hdl/cordic_vec.vhd $(PWD)/../../../CORDIC/vectoring_mode/hdl/cordic_vec_scaled.vhd $(PWD)/../hdl/boundary_cell.vhd $(PWD)/tb_boundary_cell.vhd
 	ghdl -e --std=08 tb_boundary_cell
 	ghdl -r tb_boundary_cell --wave=output.ghw
+	gtkwave output.ghw
+
+ghdl-ic:
+	ghdl -a --std=08 $(PWD)/../../../CORDIC/rotation_mode/hdl/cordic.vhd $(PWD)/../../../CORDIC/rotation_mode/hdl/cordic_rot_scaled.vhd $(PWD)/../hdl/internal_cell.vhd $(PWD)/tb_internal_cell.vhd
+	ghdl -e --std=08 tb_internal_cell
+	ghdl -r tb_internal_cell --wave=output.ghw
 	gtkwave output.ghw
 
 # Profiling of test execution (copied from https://github.com/cocotb/cocotb/blob/master/examples/matrix_multiplier/tests/Makefile)

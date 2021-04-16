@@ -35,8 +35,8 @@ entity internal_cell is
     -- since this is directly feed from Boundary Cell CORDIC Vector engines
     phi_in       : in  unsigned(31 downto 0);
     theta_in     : in  unsigned(31 downto 0);
-    bc_valid_in  : in  std_logic;
-    ic_ready     : out std_logic; -- this internal cell (IC) ready to consume
+    bc_valid_in  : in  std_logic; -- connected to BC on first IC in row, else connected to angles valid
+    ic_ready     : out std_logic; -- this internal cell (IC) ready to consume (only needed for first IC connected to BC)
 
 
     xout_real    : out signed(G_DATA_WIDTH - 1 downto 0);
@@ -48,7 +48,8 @@ entity internal_cell is
     -- high fan-out of 32b angle signals (no handshaking needed, since ICs not
     -- connected directly to a BC have handshaking/timing with rotations)
     phi_out      : out unsigned(31 downto 0);
-    theta_out    : out unsigned(31 downto 0)
+    theta_out    : out unsigned(31 downto 0);
+    angles_valid : out std_logic
   );
 end entity internal_cell;
 
@@ -80,39 +81,42 @@ architecture rtl of internal_cell is
 
   -- Input Rotator
   signal sig_in_rot_valid_out    : std_logic;
-  signal sig_in_rot_cos_out      : signed(G_ITERATIONS - 1 downto 0);
-  signal sig_in_rot_sin_out      : signed(G_ITERATIONS - 1 downto 0);
+  signal sig_in_rot_cos_out      : signed(G_DATA_WIDTH - 1 downto 0);
+  signal sig_in_rot_sin_out      : signed(G_DATA_WIDTH - 1 downto 0);
 
   -- Real Rotator
   signal sig_real_rot_valid      : std_logic;
-  signal sig_real_x_feedback     : signed(G_ITERATIONS - 1 downto 0);
-  signal sig_real_x_out          : signed(G_ITERATIONS - 1 downto 0);
-  signal sig_real_y_out          : signed(G_ITERATIONS - 1 downto 0);
+  signal sig_real_x_feedback     : signed(G_DATA_WIDTH - 1 downto 0);
+  signal sig_real_x_out          : signed(G_DATA_WIDTH - 1 downto 0);
+  signal sig_real_y_out          : signed(G_DATA_WIDTH - 1 downto 0);
 
   -- Imag Rotator
   signal sig_imag_rot_valid      : std_logic;
-  signal sig_imag_x_feedback     : signed(G_ITERATIONS - 1 downto 0);
-  signal sig_imag_x_out          : signed(G_ITERATIONS - 1 downto 0);
-  signal sig_imag_y_out          : signed(G_ITERATIONS - 1 downto 0);
+  signal sig_imag_x_feedback     : signed(G_DATA_WIDTH - 1 downto 0);
+  signal sig_imag_x_out          : signed(G_DATA_WIDTH - 1 downto 0);
+  signal sig_imag_y_out          : signed(G_DATA_WIDTH - 1 downto 0);
 
   -- Registered outputs
   signal sig_xout_real    : signed(G_DATA_WIDTH - 1 downto 0);
   signal sig_xout_imag    : signed(G_DATA_WIDTH - 1 downto 0);
   signal sig_phi_out      : unsigned(31 downto 0);
   signal sig_theta_out    : unsigned(31 downto 0);
+  signal sig_angles_valid : std_logic;
 
 begin
 
   -- assert ready once able to consume both x/sample & BC inputs
+  -- due to difference in timing between datapaths
   xin_ready    <= '1' when sig_ic_state = S_CONSUME   else '0';
   ic_ready     <= '1' when sig_ic_state = S_CONSUME   else '0';
-  bc_valid_out <= '1' when sig_ic_state = S_OUT_VALID else '0';
+  xout_valid   <= '1' when sig_ic_state = S_OUT_VALID else '0';
 
   xout_real <= sig_xout_real;
   xout_imag <= sig_xout_imag;
 
   phi_out      <= sig_phi_out;
   theta_out    <= sig_theta_out;
+  angles_valid <= sig_angles_valid;
 
   sig_inputs_valid <= xin_valid and bc_valid_in;
 
@@ -171,6 +175,26 @@ begin
     );
 
 
+  UG_no_lambda: if not G_USE_LAMBDA generate
+    S_X_feedbacks: process(clk)
+    begin
+      if rising_edge(clk) then
+        if reset = '1' then
+          sig_real_x_feedback <= (others => '0');
+          sig_imag_x_feedback <= (others => '0');
+        else
+          if sig_real_rot_valid = '1' then
+            sig_real_x_feedback <= sig_real_x_out;
+          end if;
+
+          if sig_imag_rot_valid = '1' then
+            sig_imag_x_feedback <= sig_imag_x_out;
+          end if;
+        end if;
+      end if;
+    end process S_X_feedbacks;
+  end generate UG_no_lambda;
+
   S_output_FSM: process(clk)
   begin
     if rising_edge(clk) then
@@ -209,8 +233,11 @@ begin
   S_pipeline_angles: process(clk)
   begin
     if rising_edge(clk) then
-      sig_phi_out    <= phi_out;
-      sig_theta_out  <= theta_out;
+      if bc_valid_in = '1' then
+        sig_phi_out    <= phi_in;
+        sig_theta_out  <= theta_in;
+      end if;
+      sig_angles_valid <= bc_valid_in;
     end if;
   end process S_pipeline_angles;
 
