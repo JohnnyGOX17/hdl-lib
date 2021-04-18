@@ -16,6 +16,9 @@ lambda_factor = 0.99
 print('Lambda/forgetting factor of: %0.2f' % lambda_factor)
 fxp_scale_factor = int(np.floor(lambda_factor*(2**(data_bitwidth-1))))
 print('Lambda/forgetting factor signed int (same rules as CORDIC gain above): %d [0x%X]' % (fxp_scale_factor, fxp_scale_factor))
+print('1/Lambda of: %0.2f' % (1/lambda_factor))
+fxp_scale_factor = int(np.floor((1/lambda_factor)*(2**(data_bitwidth-1))))
+print('1/Lambda signed int (same rules as CORDIC gain above): %d [0x%X]' % (fxp_scale_factor, fxp_scale_factor))
 
 # Convert angle (in degrees) to unsigned integer value for input to CORDIC block
 def degree_to_unsigned_fxp( angle, bitwidth ):
