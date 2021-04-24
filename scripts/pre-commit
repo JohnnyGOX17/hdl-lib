@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# Generates TODO.md list and VHDL package file with commit date & hash
+# Assumes git-helper scripts are installed from https://github.com/JohnnyGOX17/configs
+#
+
+# cd to git dir root
+git_root="$(git rev-parse --show-toplevel)"
+pushd "$git_root" > /dev/null
+
+todoFile="TODO_list.md"
+git-print-TODOs > "$todoFile"
+git add "$todoFile"
+
+pkgFileName="hdl_lib_git_info_pkg"
+pkgFile="./util/${pkgFileName}.vhd"
+lastGitHash="$(git rev-parse --short=8 HEAD)"
+commitDate="$(date +%Y%m%d)"
+cat << EOF > $pkgFile
+-- Git metadata of HDL-lib repo for inclusion by components to be used for identification
+-- NOTE: this is an auto-generate file from the 'pre-commit' git hook, DO NOT EDIT
+library ieee;
+  use ieee.std_logic_1164.all;
+
+package ${pkgFileName} is
+  -- NOTE: these values are assigned to 32b constants for easy inclusion to SW-accessible registers
+  -- Last commit hash of this repo
+  constant K_${pkgFileName}_COMMIT_HASH : std_logic_vector(31 downto 0) := X"${lastGitHash}";
+  -- Date of most recent commit to repo of format "YYYY_MM_DD"
+  constant K_${pkgFileName}_COMMIT_DATE : std_logic_vector(31 downto 0) := X"${commitDate}";
+end package ${pkgFileName};
+EOF
+
+git add "$pkgFile"
+
+popd > /dev/null
+

@@ -45,3 +45,8 @@ Library of common and re-use components and HDL code.
 
 Run `$ python3 run.py` (or `$ python3 run.py -v` for verbose logging from testbench outputs) to kick off VUnit regression tests.
 
+### Git Hooks
+
+Install `scripts/pre-hook` to `.git/hooks/` (or [another directory if in a submodule](https://stackoverflow.com/a/15146529)) to auto-generate [TODO list](TODO_list.md) and [git metadata package](util/hdl_lib_git_info.pkg) when committing to git repo.
+
+

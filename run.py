@@ -6,7 +6,7 @@ vu = VUnit.from_argv()
 # Create library "lib"
 lib = vu.add_library("lib")
 
-# Add all files ending in *.vhd to library "lib"
+# Add component files and VUnit Testbenches to library "lib"
 # #TODO: Eventually use blob pattern to include all? -> lib.add_source_files("./vhdl/*/*.vhd")
 lib.add_source_files("./util/*.vhd")
 lib.add_source_files("./DSP/arithmetic/adder_tree/hdl/adder_tree.vhd")
