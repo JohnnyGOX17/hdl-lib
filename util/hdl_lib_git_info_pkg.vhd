@@ -6,7 +6,7 @@ library ieee;
 package hdl_lib_git_info_pkg is
   -- NOTE: these values are assigned to 32b constants for easy inclusion to SW-accessible registers
   -- Last commit hash of this repo
-  constant K_hdl_lib_git_info_pkg_COMMIT_HASH : std_logic_vector(31 downto 0) := X"90848eb8";
+  constant K_hdl_lib_git_info_pkg_COMMIT_HASH : std_logic_vector(31 downto 0) := X"98d9f013";
   -- Date of most recent commit to repo of format "YYYY_MM_DD"
   constant K_hdl_lib_git_info_pkg_COMMIT_DATE : std_logic_vector(31 downto 0) := X"20210424";
 end package hdl_lib_git_info_pkg;
