@@ -8,9 +8,8 @@
 git_root="$(git rev-parse --show-toplevel)"
 pushd "$git_root" > /dev/null
 
-todoFile="TODO_list.md"
-git-print-TODOs > "$todoFile"
-git add "$todoFile"
+git-print-TODOs
+git add "TODO.md"
 
 pkgFileName="hdl_lib_git_info_pkg"
 pkgFile="./util/${pkgFileName}.vhd"
