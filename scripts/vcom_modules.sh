@@ -23,7 +23,6 @@ while getopts ":c:s:r" o; do
       ;;
     r)
       echo "Deleting vcom/vsim files..."
-      rm -f ./modelsim.ini
       rm -f ./transcript
       rm -f ./vsim.wlf
       rm -f ./vlog.opt

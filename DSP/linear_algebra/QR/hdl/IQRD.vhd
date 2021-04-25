@@ -212,7 +212,7 @@ begin
 
       -- Boundary Cell is always left-most/first in column
       UG_left_BC: if col_idx = 0 generate
-        U_BC_top: entity work.boundary_cell
+        U_BC: entity work.boundary_cell
           generic map (
             G_DATA_WIDTH => G_DATA_WIDTH,
             G_USE_LAMBDA => G_USE_LAMBDA
@@ -271,7 +271,8 @@ begin
             );
         end generate UG_first_IC;
 
-        UG_other_ICs: if col_idx = 1 generate
+        -- other (non-first) ICs are interconnected within a row
+        UG_other_ICs: if col_idx /= 1 generate
           U_IC: entity work.internal_cell
             generic map (
               G_DATA_WIDTH => G_DATA_WIDTH,

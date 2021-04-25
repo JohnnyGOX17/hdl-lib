@@ -15,7 +15,7 @@ Doc/
 *.str
 
 # ModelSim/Questa related
-modelsim.ini
+#modelsim.ini
 transcript
 vlog.opt
 vsim.wlf
