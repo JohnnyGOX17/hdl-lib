@@ -4,15 +4,15 @@ library ieee;
 library work;
   use work.util_pkg.all;
 
-entity tb_IQRD is
-end entity tb_IQRD;
+entity tb_IQRD_nxn is
+end entity tb_IQRD_nxn;
 
-architecture behav of tb_IQRD is
+architecture behav of tb_IQRD_nxn is
 
   constant G_DATA_WIDTH : natural  := 16;
   constant G_USE_LAMBDA : boolean  := false; -- use forgetting factor (lambda) in BC calc
-  constant G_M          : positive := 4;
-  constant G_N          : positive := 4;
+  constant G_M          : positive := 16;
+  constant G_N          : positive := 16;
 
   signal clk          : std_logic := '0';
   signal reset        : std_logic;
@@ -49,7 +49,7 @@ architecture behav of tb_IQRD is
 
 begin
 
-  -- test 4x4 matrix inversion
+  -- test nxn matrix inversion (mainly performance in test testbench rather than numerical accuracy)
   U_DUT: entity work.IQRD
     generic map (
       G_DATA_WIDTH => G_DATA_WIDTH,
@@ -82,54 +82,14 @@ begin
 
   CS_test_inputs: process
   begin
-    -- Set inputs (from MATALB 'ULA_test_data_gen.m' script)
-    -- 2D matrix A indexed as: (sample index, M)(channel index, N)
-    --   Channel 0:
-    A_real(0)(0) <= to_signed( 15548, G_DATA_WIDTH );
-    A_imag(0)(0) <= to_signed(     0, G_DATA_WIDTH );
-    A_real(1)(0) <= to_signed(  4102, G_DATA_WIDTH );
-    A_imag(1)(0) <= to_signed( -5194, G_DATA_WIDTH );
-    A_real(2)(0) <= to_signed(   270, G_DATA_WIDTH );
-    A_imag(2)(0) <= to_signed(  1749, G_DATA_WIDTH );
-    A_real(3)(0) <= to_signed(  8018, G_DATA_WIDTH );
-    A_imag(3)(0) <= to_signed(  4694, G_DATA_WIDTH );
-    --   Channel 1:
-    A_real(0)(1) <= to_signed(  4102, G_DATA_WIDTH );
-    A_imag(0)(1) <= to_signed(  5194, G_DATA_WIDTH );
-    A_real(1)(1) <= to_signed( 16384, G_DATA_WIDTH );
-    A_imag(1)(1) <= to_signed(     0, G_DATA_WIDTH );
-    A_real(2)(1) <= to_signed(  4125, G_DATA_WIDTH );
-    A_imag(2)(1) <= to_signed( -5680, G_DATA_WIDTH );
-    A_real(3)(1) <= to_signed(   249, G_DATA_WIDTH );
-    A_imag(3)(1) <= to_signed(  1779, G_DATA_WIDTH );
-    --   Channel 2:
-    A_real(0)(2) <= to_signed(   270, G_DATA_WIDTH );
-    A_imag(0)(2) <= to_signed( -1749, G_DATA_WIDTH );
-    A_real(1)(2) <= to_signed(  4125, G_DATA_WIDTH );
-    A_imag(1)(2) <= to_signed(  5680, G_DATA_WIDTH );
-    A_real(2)(2) <= to_signed( 16272, G_DATA_WIDTH );
-    A_imag(2)(2) <= to_signed(     0, G_DATA_WIDTH );
-    A_real(3)(2) <= to_signed(  4358, G_DATA_WIDTH );
-    A_imag(3)(2) <= to_signed( -5240, G_DATA_WIDTH );
-    --   Channel 3:
-    A_real(0)(3) <= to_signed(  8018, G_DATA_WIDTH );
-    A_imag(0)(3) <= to_signed( -4694, G_DATA_WIDTH );
-    A_real(1)(3) <= to_signed(   249, G_DATA_WIDTH );
-    A_imag(1)(3) <= to_signed( -1779, G_DATA_WIDTH );
-    A_real(2)(3) <= to_signed(  4358, G_DATA_WIDTH );
-    A_imag(2)(3) <= to_signed(  5240, G_DATA_WIDTH );
-    A_real(3)(3) <= to_signed( 16301, G_DATA_WIDTH );
-    A_imag(3)(3) <= to_signed(     0, G_DATA_WIDTH );
-
-    -- b vector:
-    b_real(0) <= to_signed( 8192, G_DATA_WIDTH);
-    b_imag(0) <= to_signed(    0, G_DATA_WIDTH);
-    b_real(1) <= to_signed( 8192, G_DATA_WIDTH);
-    b_imag(1) <= to_signed(    0, G_DATA_WIDTH);
-    b_real(2) <= to_signed( 8192, G_DATA_WIDTH);
-    b_imag(2) <= to_signed(    0, G_DATA_WIDTH);
-    b_real(3) <= to_signed( 8192, G_DATA_WIDTH);
-    b_imag(3) <= to_signed(    0, G_DATA_WIDTH);
+    for k_idx in 0 to G_M - 1 loop
+      for ch_idx in 0 to G_N - 1 loop
+        A_real(k_idx)(ch_idx) <= to_signed( ch_idx*k_idx, G_DATA_WIDTH );
+        A_imag(k_idx)(ch_idx) <= to_signed(      -ch_idx, G_DATA_WIDTH );
+      end loop;
+      b_real(k_idx) <= to_signed( 8192, G_DATA_WIDTH);
+      b_imag(k_idx) <= to_signed(    0, G_DATA_WIDTH);
+    end loop;
 
     -- stay ready for x output for now
     x_ready <= '1';

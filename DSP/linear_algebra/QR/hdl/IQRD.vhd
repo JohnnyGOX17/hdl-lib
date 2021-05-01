@@ -138,13 +138,14 @@ begin
           sig_A_idx  (col_idx) <= (others => '0');
           sig_A_valid(col_idx) <= '0';
         else
-          if sig_A_ready(col_idx) = '1' then
+          if (sig_A_ready(col_idx) = '1') and (sig_A_valid(col_idx) = '1') then
             -- if we're at the end of indexing the A matrix, samples are no longer valid
             if sig_A_idx(col_idx) = (G_M - 1) then
               sig_A_valid(col_idx) <= '0';
+            else
+              -- increment A-matrix index when systolic array consumes a sample
+              sig_A_idx(col_idx) <= sig_A_idx(col_idx) + 1;
             end if;
-            -- increment A-matrix index when systolic array consumes a sample
-            sig_A_idx(col_idx) <= sig_A_idx(col_idx) + 1;
           end if;
 
           if sig_iqrd_state = S_CONSUME then
@@ -162,13 +163,14 @@ begin
         sig_b_idx   <= (others => '0');
         sig_b_valid <= '0';
       else
-        if sig_b_ready = '1' then
+        if (sig_b_ready = '1') and (sig_b_valid = '1') then
           -- if we're at the end of indexing the b vector, samples are no longer valid
           if sig_b_idx = (G_M - 1) then
             sig_b_valid <= '0';
+          else
+            -- increment b-vector index when systolic array consumes a sample
+            sig_b_idx <= sig_b_idx + 1;
           end if;
-          -- increment b-vector index when systolic array consumes a sample
-          sig_b_idx <= sig_b_idx + 1;
         end if;
 
         if sig_iqrd_state = S_CONSUME then

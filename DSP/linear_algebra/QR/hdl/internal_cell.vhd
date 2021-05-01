@@ -35,7 +35,7 @@ entity internal_cell is
     -- since this is directly feed from Boundary Cell CORDIC Vector engines
     phi_in       : in  unsigned(31 downto 0);
     theta_in     : in  unsigned(31 downto 0);
-    bc_valid_in  : in  std_logic; -- connected to BC on first IC in row, else connected to angles valid
+    bc_valid_in  : in  std_logic; -- connected to BC on first IC in row, else connected to angles valid from previous IC in row
     ic_ready     : out std_logic; -- this internal cell (IC) ready to consume (only needed for first IC connected to BC)
 
 
@@ -97,11 +97,10 @@ architecture rtl of internal_cell is
   signal sig_imag_y_out          : signed(G_DATA_WIDTH - 1 downto 0);
 
   -- Registered outputs
-  signal sig_xout_real    : signed(G_DATA_WIDTH - 1 downto 0);
-  signal sig_xout_imag    : signed(G_DATA_WIDTH - 1 downto 0);
-  signal sig_phi_out      : unsigned(31 downto 0);
-  signal sig_theta_out    : unsigned(31 downto 0);
-  signal sig_angles_valid : std_logic;
+  signal sig_xout_real        : signed(G_DATA_WIDTH - 1 downto 0);
+  signal sig_xout_imag        : signed(G_DATA_WIDTH - 1 downto 0);
+  signal sig_phi_out          : unsigned(31 downto 0);
+  signal sig_theta_out        : unsigned(31 downto 0);
 
 begin
 
@@ -110,13 +109,12 @@ begin
   xin_ready    <= '1' when sig_ic_state = S_CONSUME   else '0';
   ic_ready     <= '1' when sig_ic_state = S_CONSUME   else '0';
   xout_valid   <= '1' when sig_ic_state = S_OUT_VALID else '0';
+  angles_valid <= '1' when sig_ic_state = S_OUT_VALID else '0';
 
   xout_real <= sig_xout_real;
   xout_imag <= sig_xout_imag;
-
-  phi_out      <= sig_phi_out;
-  theta_out    <= sig_theta_out;
-  angles_valid <= sig_angles_valid;
+  phi_out   <= sig_phi_out;
+  theta_out <= sig_theta_out;
 
   -- gated valid signal, only propagate through once we've consumed a sample
   sig_inputs_valid <= '1' when sig_ic_state = S_CONSUME else '0';
@@ -234,11 +232,10 @@ begin
   S_pipeline_angles: process(clk)
   begin
     if rising_edge(clk) then
-      if bc_valid_in = '1' then
-        sig_phi_out    <= phi_in;
-        sig_theta_out  <= theta_in;
+      if bc_valid_in = '1' then -- reg angles whenever valid to hold until output
+        sig_phi_out   <= phi_in;
+        sig_theta_out <= theta_in;
       end if;
-      sig_angles_valid <= bc_valid_in;
     end if;
   end process S_pipeline_angles;
 
