@@ -84,6 +84,10 @@ begin
     xin_imag  <= (others => '0');
     xin_valid <= '0';
 
+    -- test out constantly valid inputs to check consumption timing
+    wait until xout_valid = '1' and rising_edge(clk);
+    xin_valid <= '1';
+
     wait;
   end process CS_test_sample_inputs;
 
@@ -100,6 +104,10 @@ begin
     theta_in    <= (others => '0');
     bc_valid_in <= '0';
 
+    -- test out constantly valid inputs to check consumption timing
+    wait until xout_valid = '1' and rising_edge(clk);
+    bc_valid_in <= '1';
+
     wait;
   end process CS_test_angle_inputs;
 
@@ -112,7 +120,19 @@ begin
     report "X Out: " & integer'image(to_integer(xout_real)) & " + " &
       integer'image(to_integer(xout_imag)) & "j";
 
+    -- test out constantly valid inputs to check consumption timing
+    wait for 2 us;
+
+    -- test hold-up in downstream IC logic
+    wait until rising_edge(clk);
+    xout_ready <= '0';
+    wait until rising_edge(clk) and xout_valid = '1';
     wait for 100 ns;
+    wait until rising_edge(clk);
+    xout_ready <= '1';
+    wait for 2 us;
+
+    report "SIM COMPLETE";
     sim_end <= true;
     wait;
   end process CS_monitor_outputs;

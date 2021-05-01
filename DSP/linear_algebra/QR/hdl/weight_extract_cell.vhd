@@ -80,10 +80,8 @@ begin
   aout_imag    <= sig_aout_imag;
   aout_valid   <= sig_aout_valid;
 
-  --sig_input_valid <= ain_valid and b_valid;
-  sig_input_valid <= b_valid; -- only care about b_valid to continue
-
-  b_ready <= '1' when sig_weight_state = S_CONSUME else '0';
+  sig_input_valid <= '1' when sig_weight_state = S_CONSUME else '0';
+  b_ready         <= '1' when sig_weight_state = S_CONSUME else '0';
 
   w_real  <= resize( shift_right( sig_weight_z_real, 1 ), w_real'length );
   w_imag  <= resize( shift_right( sig_weight_z_imag, 1 ), w_imag'length );
@@ -96,8 +94,10 @@ begin
       if reset = '1' then
         sig_aout_valid <= '0';
       else
-        sig_aout_real  <= ain_real;
-        sig_aout_imag  <= ain_imag;
+        if ain_valid = '1' then
+          sig_aout_real  <= ain_real;
+          sig_aout_imag  <= ain_imag;
+        end if;
         sig_aout_valid <= ain_valid;
       end if;
     end if;
@@ -150,6 +150,8 @@ begin
       else
         case sig_weight_state is
           when S_IDLE =>
+            -- only care about b_valid to continue, since a should always be updated
+            -- before b value since it comes from a preceeding QRD column output
             if b_valid = '1' then
               sig_weight_state <= S_CONSUME;
             end if;

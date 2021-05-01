@@ -75,7 +75,20 @@ begin
     report "Phi Out: " & integer'image(to_integer(phi_out(30 downto 0))) & " [0x" & to_hstring(phi_out) & "]";
     report "Theta Out: " & integer'image(to_integer(theta_out(30 downto 0))) & " [0x" & to_hstring(theta_out) & "]";
 
+    -- test out constantly valid inputs to check consumption timing
+    x_valid <= '1';
+    wait for 2 us;
+
+    -- test hold-up in downstream IC logic
+    wait until rising_edge(clk);
+    ic_ready <= '0';
+    wait until rising_edge(clk) and bc_valid_out = '1';
     wait for 100 ns;
+    wait until rising_edge(clk);
+    ic_ready <= '1';
+    wait for 2 us;
+
+    report "SIM COMPLETE";
     sim_end <= true;
     wait;
   end process CS_test_inputs;

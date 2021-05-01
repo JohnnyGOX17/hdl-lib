@@ -66,6 +66,7 @@ architecture rtl of boundary_cell is
   signal sig_bc_state : T_bc_fsm := S_IDLE;
 
   -- related to U_input_vectoring
+  signal sig_x_valid_gated   : std_logic;
   signal sig_input_vec_valid : std_logic := '0';
   signal sig_phi_out         : unsigned(31 downto 0);
   signal sig_input_vec_mag   : signed(G_DATA_WIDTH - 1 downto 0);
@@ -88,10 +89,12 @@ architecture rtl of boundary_cell is
 
 begin
 
-  x_ready      <= '1' when sig_bc_state = S_IDLE else '0';
+  x_ready      <= '1' when (sig_bc_state = S_IDLE) and (reset = '0') else '0';
   phi_out      <= sig_phi_out_q;
   theta_out    <= sig_theta_out_q;
   bc_valid_out <= '1' when sig_bc_state = S_OUT_VALID else '0';
+
+  sig_x_valid_gated <= x_valid when sig_bc_state = S_IDLE else '0';
 
   U_input_vectoring: cordic_vec_scaled
     generic map (
@@ -100,7 +103,7 @@ begin
     port map (
       clk          => clk,
       reset        => reset,
-      valid_in     => x_valid,
+      valid_in     => sig_x_valid_gated,
       x_in         => x_real,
       y_in         => x_imag,
       CORDIC_scale => CORDIC_scale,
@@ -110,8 +113,11 @@ begin
       mag_out      => sig_input_vec_mag -- mag = sqrt(I**2 + Q**2)
     );
 
-  -- #TODO: need only care about input vectoring timing??
-  --sig_output_vec_valid_in <= sig_feedback_mag_valid and sig_input_vec_valid;
+  -- we need only care about input vectoring magnitude valid as feedback magnitude
+  -- will _always_ be valid and stable before this point, due to being calculated
+  -- from previous cycle (or from reset, default value). Thus the signal
+  -- `sig_feedback_mag_valid` is purely for informational/debug value, and will
+  -- get optmized out as a dead-path in synthesis as nothing reads it
   sig_output_vec_valid_in <= sig_input_vec_valid;
 
   U_output_vectoring: cordic_vec_scaled

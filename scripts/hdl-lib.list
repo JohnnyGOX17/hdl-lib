@@ -20,6 +20,7 @@
 ../DSP/linear_algebra/QR/hdl/IQRD.vhd
 ../DSP/linear_algebra/QR/sim/tb_boundary_cell.vhd
 ../DSP/linear_algebra/QR/sim/tb_internal_cell.vhd
+../DSP/linear_algebra/QR/sim/tb_weight_extract_cell.vhd
 ../DSP/linear_algebra/QR/sim/tb_IQRD.vhd
 ../IO_interfaces/bidir_iobuf.vhd
 ../IO_interfaces/seven_seg_disp.vhd

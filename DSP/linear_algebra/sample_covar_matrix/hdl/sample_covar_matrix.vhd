@@ -4,6 +4,8 @@ library ieee;
 library work;
   use work.util_pkg.all;
 
+-- #TODO: use find first set bit in MSB (largest across matrix) to dynamically scale elements to output bitwidth?
+
 entity sample_covar_matrix is
   generic (
     G_DATA_WIDTH : natural := 16; -- real & imag part sample bitwidth

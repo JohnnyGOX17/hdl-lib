@@ -118,7 +118,8 @@ begin
   theta_out    <= sig_theta_out;
   angles_valid <= sig_angles_valid;
 
-  sig_inputs_valid <= xin_valid and bc_valid_in;
+  -- gated valid signal, only propagate through once we've consumed a sample
+  sig_inputs_valid <= '1' when sig_ic_state = S_CONSUME else '0';
 
   U_input_rotator: cordic_rot_scaled
     generic map (
