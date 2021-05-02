@@ -25,21 +25,22 @@ def write_FC_weight_files(weights, layerID, bitWidth):
 
 if __name__ == "__main__":
     # execute only if run as a script
-    nBits    = 8  # bitwidth of quantized integer weights
-    layerIdx = 0  # layer index to help identify sets of weight files
+    nBits      = 8  # bitwidth of quantized integer weights
+    FClayerIdx = 0  # layer index to help identify sets of weight files
 
     # Netron easily export layer weights directly as NumPy array files
     conv2D_weights = np.load("./sequential_conv2d_0")
     FC0_weights    = np.load("./sequential_dense_MatMul_FC0")
     FC1_weights    = np.load("./sequential_dense_MatMul_FC1")
 
+    print("2D-convolutional filter dimensions:")
     print("\tLayer 0: 2D convolution weights of size {}".format(conv2D_weights.shape))
     print("Fully-connected dimensions = (output, input)")
     print("\tLayer 1: Fully-connected weights of size {}".format(FC0_weights.shape))
     print("\tLayer 2: Fully-connected weights of size {}".format(FC1_weights.shape))
 
-    write_FC_weight_files(FC0_weights, layerIdx, nBits)
-    layerIdx += 1
-    write_FC_weight_files(FC1_weights, layerIdx, nBits)
+    write_FC_weight_files(FC0_weights, FClayerIdx, nBits)
+    FClayerIdx += 1
+    write_FC_weight_files(FC1_weights, FClayerIdx, nBits)
 
 
