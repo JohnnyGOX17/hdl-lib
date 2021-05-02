@@ -27,7 +27,7 @@ architecture behav of tb_FC is
   signal din_valid      : std_logic;
   signal din            : T_signed_2D(G_NUM_INPUTS - 1 downto 0)(G_DATA_WIDTH - 1 downto 0);
   signal dout_valid     : std_logic;
-  signal dout           : signed(G_DATA_WIDTH - 1 downto 0);
+  signal dout           : T_signed_2D(G_NUM_OUTPUTS - 1 downto 0)(G_DATA_WIDTH - 1 downto 0);
 
 begin
 
@@ -42,7 +42,8 @@ begin
       G_NUM_OUTPUTS  => G_NUM_OUTPUTS,
       G_ACCUM_WIDTH  => G_ACCUM_WIDTH,
       G_LAYER_IDX    => G_LAYER_IDX,
-      G_BASE_PATH    => G_BASE_PATH
+      G_BASE_PATH    => G_BASE_PATH,
+      G_ACTIVATION   => "RELU"
     )
     port map (
       clk            => clk,
@@ -67,6 +68,8 @@ begin
     wait until rising_edge(clk);
     din_valid <= '0';
 
+    wait until rising_edge(clk) and dout_valid = '1';
+    report "SIM COMPLETE!" severity note;
     wait;
   end process CS_test_inputs;
 
