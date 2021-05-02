@@ -24,6 +24,12 @@
 ../DSP/linear_algebra/QR/sim/tb_IQRD_3x3.vhd
 ../DSP/linear_algebra/QR/sim/tb_IQRD_4x4.vhd
 ../DSP/linear_algebra/QR/sim/tb_IQRD_nxn.vhd
+../DSP/ML/neural/hdl/perceptron.vhd
+../DSP/ML/neural/sim/tb_perceptron.vhd
+../DSP/ML/activation/hdl/ReLU.vhd
+../DSP/ML/activation/sim/tb_ReLU.vhd
+../DSP/ML/layers/FC/hdl/FC.vhd
+../DSP/ML/layers/FC/sim/tb_FC.vhd
 ../IO_interfaces/bidir_iobuf.vhd
 ../IO_interfaces/seven_seg_disp.vhd
 ../IO_interfaces/PWM/pwm.vhd

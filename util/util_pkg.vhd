@@ -38,6 +38,10 @@ package util_pkg is
   function   F_clog2( x : natural ) return integer;
   function F_is_even( x : integer ) return boolean;
   function  F_is_odd( x : integer ) return boolean;
+
+  function F_FFS_bit( x : std_logic_vector ) return integer;
+  function F_FFS_bit( x : signed ) return integer;
+  function F_FFS_bit( x : unsigned ) return integer;
 -- // End: Number Utilities ///////////////////////////////////////////////////
 
 end util_pkg;
@@ -58,7 +62,7 @@ package body util_pkg is
     file     fd       : text;
     variable V_line   : line;
     variable V_bitvec : bit_vector(slv_length - 1 downto 0);
-    variable V_return : T_slv_2D(dim_length - 1 downto 0)(slv_length -1 downto 0)
+    variable V_return : T_slv_2D(dim_length - 1 downto 0)(slv_length - 1 downto 0)
                         := (others => (others => '0'));
   begin
     if file_path /= "" then
@@ -125,6 +129,32 @@ package body util_pkg is
   begin
     return (x mod 2) = 1;
   end F_is_odd;
+
+  -- Find First Set bit: returns the first set bit, respecting
+  --   given SLV range direction (e.g. if x(2 downto 0) := "011",
+  --   F_FFS_bit(x) would return index '1', however if defined as
+  --   x(0 to 2) := "011", F_FFS_bit(x) returns index '0')
+  function F_FFS_bit( x : std_logic_vector ) return integer is
+  begin
+    for i in x'range loop
+      if x(i) = '1' then
+        return i;
+      end if;
+    end loop;
+    -- set bit not found (all 0's), return left-most index since this
+    -- function is often used to decide how much to shift
+    return x'left;
+  end F_FFS_bit;
+
+  function F_FFS_bit( x : signed ) return integer is
+  begin
+    return F_FFS_bit( std_logic_vector( x ) );
+  end F_FFS_bit;
+
+  function F_FFS_bit( x : unsigned ) return integer is
+  begin
+    return F_FFS_bit( std_logic_vector( x ) );
+  end F_FFS_bit;
 -- // End: Number Utilities ///////////////////////////////////////////////////
 
 end util_pkg;
