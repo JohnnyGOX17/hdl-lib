@@ -32,6 +32,8 @@
 ../DSP/ML/activation/sim/tb_ReLU.vhd
 ../DSP/ML/layers/FC/hdl/FC.vhd
 ../DSP/ML/layers/FC/sim/tb_FC.vhd
+../DSP/ML/example_CNNs/ABF_CNN_N9x8x2.vhd
+../DSP/ML/example_CNNs/tb_ABF_CNN_N9x8x2.vhd
 ../IO_interfaces/bidir_iobuf.vhd
 ../IO_interfaces/seven_seg_disp.vhd
 ../IO_interfaces/PWM/pwm.vhd
