@@ -12,9 +12,11 @@ package util_pkg is
   type T_slv_2D      is array (integer range <>) of std_logic_vector;
   type T_signed_2D   is array (integer range <>) of signed;
   type T_unsigned_2D is array (integer range <>) of unsigned;
+  type T_int_2D      is array (integer range <>) of integer;
   type T_slv_3D      is array (integer range <>) of T_slv_2D;
   type T_signed_3D   is array (integer range <>) of T_signed_2D;
   type T_unsigned_3D is array (integer range <>) of T_unsigned_2D;
+  type T_int_3D      is array (integer range <>) of T_int_2D;
 -- // End: Common Types ///////////////////////////////////////////////////////
 
 -- // Start: File I/O Utilities ///////////////////////////////////////////////

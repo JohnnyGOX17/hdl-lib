@@ -10,6 +10,8 @@
 ../DSP/CORDIC/vectoring_mode/hdl/cordic_vec.vhd
 ../DSP/CORDIC/vectoring_mode/hdl/cordic_vec_scaled.vhd
 ../DSP/CORDIC/vectoring_mode/sim/tb_cordic_vec.vhd
+../DSP/filters/conv2D/hdl/conv2D.vhd
+../DSP/filters/conv2D/sim/tb_conv2D.vhd
 ../DSP/linear_algebra/dot_product/hdl/dot_product_cmplx.vhd
 ../DSP/linear_algebra/dot_product/hdl/dot_product_real.vhd
 ../DSP/linear_algebra/dot_product/sim/tb_dot_product_cmplx.vhd

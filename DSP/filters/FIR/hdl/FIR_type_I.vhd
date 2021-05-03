@@ -20,7 +20,7 @@ entity FIR_type_I is
     din          : in  std_logic_vector(G_DATA_WIDTH - 1 downto 0);
     dout_valid   : out std_logic;
     dout         : out std_logic_vector(G_DATA_WIDTH - 1 downto 0)
-  )
+  );
 end entity FIR_type_I;
 
 architecture rtl of FIR_type_I is
