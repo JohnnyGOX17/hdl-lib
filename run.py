@@ -17,7 +17,7 @@ lib.add_source_files("./DSP/CORDIC/rotation_mode/sim/tb_cordic_rot_scaled.vhd")
 lib.add_source_files("./DSP/CORDIC/vectoring_mode/hdl/cordic_vec.vhd")
 lib.add_source_files("./DSP/CORDIC/vectoring_mode/hdl/cordic_vec_scaled.vhd")
 lib.add_source_files("./DSP/CORDIC/vectoring_mode/sim/tb_cordic_vec_scaled.vhd")
-lib.add_source_files("./memory-FIFO-SRL/RAM-ROM/*.vhd")
+lib.add_source_files("./memory-FIFO-SRL/RAM-ROM/single_port/sp_ram.vhd")
 
 # GHDL options
 #vu.set_compile_option("ghdl.flags", ["--std=08", "--enable-openieee"])

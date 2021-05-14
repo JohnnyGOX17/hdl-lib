@@ -1,12 +1,15 @@
 // basic counter module
 
-module counter(
+module counter
+#(
+  parameter G_WIDTH = 8
+)
+(
   input wire clk,
   input wire reset,
   output reg [G_WIDTH - 1 : 0] out
 );
 
-  parameter G_WIDTH = 8;
 
   /* async assert, sync deassert reset */
   always @(posedge clk or posedge reset)

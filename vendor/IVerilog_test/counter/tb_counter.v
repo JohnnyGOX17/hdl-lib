@@ -17,12 +17,16 @@ module tb_counter;
   always #5 clk = !clk;
 
   wire [3:0] value;
-  counter DUT (
+  counter
+  #(
+    .G_WIDTH(4)
+  )
+  DUT
+  (
     .clk(clk),
     .reset(reset),
     .out(value)
   );
-  defparam DUT.G_WIDTH = 4;
 
   initial
     $monitor("At time %t, value = %h (%0d)",
