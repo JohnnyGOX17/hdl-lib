@@ -58,11 +58,15 @@ module AXIS_reg_slice
         end
 
         // best case, registered version of m_axis_tready is high here
+        // since we already have something buffered here... if downstream tready is high
+        // then we can give data right away, otherwise we have to wait, can capture at least one more
         INPUT_VALID: begin // waiting for downstream slave tready assertion
           if (m_axis_tready && ~s_axis_tvalid) begin
             fsm_state <= IDLE_STATE;
-          end else if (~m_axis_tready) begin
+          end else if (~m_axis_tready && s_axis_tvalid) begin
             fsm_state <= WAIT_FOR_SLAVE;
+          end else if (m_axis_tready && s_axis_tvalid) begin
+            s_axis_tdata_reg_sel <= ~s_axis_tdata_reg_sel;
           end
 
           if (s_axis_tvalid) begin
@@ -71,13 +75,15 @@ module AXIS_reg_slice
             end else begin
               s_axis_tdata_reg0 <= s_axis_tdata;
             end
-            s_axis_tdata_reg_sel <= ~s_axis_tdata_reg_sel;
           end
         end
 
-        WAIT_FOR_SLAVE:
-          if (m_axis_tready)
-            fsm_state <= IDLE_STATE;
+        WAIT_FOR_SLAVE: begin // by nature of being here, both buffers valid
+          if (m_axis_tready) begin
+            s_axis_tdata_reg_sel <= ~s_axis_tdata_reg_sel;
+            fsm_state            <= INPUT_VALID;
+          end
+        end
 
         default: fsm_state <= IDLE_STATE;
       endcase
